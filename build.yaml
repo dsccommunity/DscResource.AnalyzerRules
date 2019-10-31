@@ -75,6 +75,7 @@ Pester: #Passthru, OutputFile, CodeCoverageOutputFile not supported
   # - tests/Unit
   # - tests/Integration
   ExcludeTag:
+    - helpQuality
   Tag:
   CodeCoverageThreshold: 50 # Set to 0 to bypass
 
