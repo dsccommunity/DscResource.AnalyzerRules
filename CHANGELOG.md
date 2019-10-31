@@ -10,3 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Create new module out of the nested one from DscResource.tests
+
+### Changed
+
+- Performance improvement on QA tests
+- Excluded Help Quality for now

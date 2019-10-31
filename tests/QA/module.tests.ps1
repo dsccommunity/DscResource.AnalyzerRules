@@ -46,7 +46,7 @@ $SourcePath = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
     }
 
     $mut = Import-Module -Name $ProjectName -ErrorAction SilentlyContinue -PassThru -Force
-    $allModuleFunctions = &$mut { &$mut { Get-Command -Module $ProjectName } }
+    $allModuleFunctions = &$mut { Get-Command -Module $ProjectName }
 
     if (Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue) {
         $scriptAnalyzerRules = Get-ScriptAnalyzerRule
