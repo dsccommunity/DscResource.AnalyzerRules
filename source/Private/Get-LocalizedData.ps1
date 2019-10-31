@@ -41,7 +41,6 @@ of the DATA section variable in the value of the BindingVariable parameter. Then
 when Import-LocalizedData saves the imported content in the BindingVariable, the
 imported data will replace the default text strings. If you are not specifying
 default text strings, you can select any variable name.
-
 .PARAMETER UICulture
 Specifies an alternate UI culture. The default is the value of the $PsUICulture
 automatic variable. Enter a UI culture in <language>-<region> format, such as
@@ -61,8 +60,8 @@ script.
 
 .PARAMETER BaseDirectory
 Specifies the base directory where the .psd1 files are located. The default is
-the directory where the script is located. Import-LocalizedData searches for the
-.psd1 file for the script in a language-specific subdirectory of the base
+the directory where the script is located. Import-LocalizedData searches for
+the .psd1 file for the script in a language-specific subdirectory of the base
 directory.
 
 .PARAMETER FileName
