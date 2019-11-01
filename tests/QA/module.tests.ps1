@@ -12,6 +12,9 @@ $SourcePath = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
         $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch { $false }) }
     ).Directory.FullName
 
+$mut = Import-Module -Name $ProjectName -ErrorAction Stop -PassThru -Force
+$allModuleFunctions = &$mut {Get-Command -Module $args[0] -CommandType Function } $ProjectName
+
     Describe 'Changelog Management' -Tag 'Changelog' {
         It 'Changelog has been updated' -skip:(
             !([bool](Get-Command git -EA SilentlyContinue) -and
@@ -44,9 +47,6 @@ $SourcePath = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
             Get-Module $ProjectName | Should -beNullOrEmpty
         }
     }
-
-    $mut = Import-Module -Name $ProjectName -ErrorAction SilentlyContinue -PassThru -Force
-    $allModuleFunctions = &$mut { Get-Command -Module $ProjectName }
 
     if (Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue) {
         $scriptAnalyzerRules = Get-ScriptAnalyzerRule
