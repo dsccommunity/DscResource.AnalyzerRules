@@ -4,7 +4,7 @@
         Returns the extent text as an array of strings.
 
     .EXAMPLE
-        Get-StatementBlockAsRows -StatementBlock $ScriptBlockAst.Extent
+        Get-StatementBlockAsRow -StatementBlock $ScriptBlockAst.Extent
 
     .INPUTS
         [System.String]
@@ -15,7 +15,7 @@
    .NOTES
         None
 #>
-function Get-StatementBlockAsRows
+function Get-StatementBlockAsRow
 {
     [CmdletBinding()]
     [OutputType([System.String[]])]

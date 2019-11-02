@@ -11,7 +11,7 @@ $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
 Import-Module $ProjectName
 
 InModuleScope $ProjectName {
-    Describe 'Get-StatementBlockAsRows' {
+    Describe 'Get-StatementBlockAsRow' {
         Context 'When string contains CRLF as new line' {
             BeforeAll {
                 $expectedReturnValue1 = 'First line'
@@ -24,7 +24,7 @@ InModuleScope $ProjectName {
                 }
 
                 $getStatementBlockAsRowsResult = `
-                    Get-StatementBlockAsRows @getStatementBlockAsRowsParameters
+                    Get-StatementBlockAsRow @getStatementBlockAsRowsParameters
 
                 $getStatementBlockAsRowsResult[0] | Should -Be $expectedReturnValue1
                 $getStatementBlockAsRowsResult[1] | Should -Be $expectedReturnValue2
@@ -38,7 +38,7 @@ InModuleScope $ProjectName {
                 }
 
                 $getStatementBlockAsRowsResult = `
-                    Get-StatementBlockAsRows @getStatementBlockAsRowsParameters
+                    Get-StatementBlockAsRow @getStatementBlockAsRowsParameters
 
                 $getStatementBlockAsRowsResult[0] | Should -Be $expectedReturnValue1
                 $getStatementBlockAsRowsResult[1] | Should -Be $expectedReturnValue2

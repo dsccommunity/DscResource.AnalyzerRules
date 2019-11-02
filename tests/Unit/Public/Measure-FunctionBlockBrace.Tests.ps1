@@ -15,11 +15,11 @@ $localizedData = &$ModuleUnderTest { $Script:LocalizedData }
 $modulePath = $ModuleUnderTest.Path
 
 
-Describe 'Measure-FunctionBlockBraces' {
+Describe 'Measure-FunctionBlockBrace' {
     Context 'When calling the function directly' {
         BeforeAll {
             $astType = 'System.Management.Automation.Language.FunctionDefinitionAst'
-            $ruleName = 'Measure-FunctionBlockBraces'
+            $ruleName = 'Measure-FunctionBlockBrace'
         }
 
         Context 'When a functions opening brace is on the same line as the function keyword' {
@@ -41,7 +41,7 @@ Describe 'Measure-FunctionBlockBraces' {
                 '
 
                 $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-FunctionBlockBraces -FunctionDefinitionAst $mockAst[0]
+                $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
                 ($record | Measure-Object).Count | Should -Be 1
                 $record.Message | Should -Be $localizedData.FunctionOpeningBraceNotOnSameLine
                 $record.RuleName | Should -Be $ruleName
@@ -67,7 +67,7 @@ Describe 'Measure-FunctionBlockBraces' {
                 '
 
                 $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-FunctionBlockBraces -FunctionDefinitionAst $mockAst[0]
+                $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
                 ($record | Measure-Object).Count | Should -Be 1
                 $record.Message | Should -Be $localizedData.FunctionOpeningBraceShouldBeFollowedByNewLine
                 $record.RuleName | Should -Be $ruleName
@@ -95,7 +95,7 @@ Describe 'Measure-FunctionBlockBraces' {
                 '
 
                 $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-FunctionBlockBraces -FunctionDefinitionAst $mockAst[0]
+                $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
                 ($record | Measure-Object).Count | Should -Be 1
                 $record.Message | Should -Be $localizedData.FunctionOpeningBraceShouldBeFollowedByOnlyOneNewLine
                 $record.RuleName | Should -Be $ruleName
@@ -108,7 +108,7 @@ Describe 'Measure-FunctionBlockBraces' {
             $invokeScriptAnalyzerParameters = @{
                 CustomRulePath = $modulePath
             }
-            $ruleName = "$($script:ModuleName)\Measure-FunctionBlockBraces"
+            $ruleName = "$($script:ModuleName)\Measure-FunctionBlockBrace"
         }
 
         Context 'When a functions opening brace is on the same line as the function keyword' {

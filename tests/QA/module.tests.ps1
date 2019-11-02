@@ -60,6 +60,10 @@ $allModuleFunctions = &$mut {Get-Command -Module $args[0] -CommandType Function 
         }
     }
 
+    # As per https://github.com/PowerShell/PSScriptAnalyzer/blob/master/Tests/Engine/GetScriptAnalyzerRule.tests.ps1#L68-L70
+    # for PowerShell Core, PSUseSingularNouns is not
+    # shipped because it uses APIs that are not present
+    # in dotnet core.
     foreach ($function in $allModuleFunctions) {
         $functionFile = Get-ChildItem -path $SourcePath -Recurse -Include "$($function.Name).ps1"
         Describe "Quality for $($function.Name)" -Tags 'TestQuality' {

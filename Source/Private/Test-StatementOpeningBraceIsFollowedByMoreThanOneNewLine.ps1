@@ -28,7 +28,7 @@ function Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine
         $StatementBlock
     )
 
-    $statementBlockRows = Get-StatementBlockAsRows -StatementBlock $StatementBlock
+    $statementBlockRows = Get-StatementBlockAsRow -StatementBlock $StatementBlock
     if ($statementBlockRows.Count -ge 3)
     {
         # Check so that an opening brace is followed by only one new line.
