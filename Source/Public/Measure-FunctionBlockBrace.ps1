@@ -8,7 +8,7 @@
         Also, the opening brace should be followed by a new line.
 
     .EXAMPLE
-        Measure-FunctionBlockBraces -FunctionDefinitionAst $ScriptBlockAst
+        Measure-FunctionBlockBrace -FunctionDefinitionAst $ScriptBlockAst
 
     .INPUTS
         [System.Management.Automation.Language.FunctionDefinitionAst]
@@ -19,7 +19,7 @@
    .NOTES
         None
 #>
-function Measure-FunctionBlockBraces
+function Measure-FunctionBlockBrace
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]])]
