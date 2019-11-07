@@ -44,7 +44,7 @@ function Measure-ParameterBlockParameterAttribute
         #>
         if (!$inAClass)
         {
-            if ($ParameterAst.Attributes.TypeName.FullName -notcontains 'parameter')
+            if ($ParameterAst.Attributes.TypeName.FullName -notContains 'parameter')
             {
                 $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockParameterAttributeMissing
 

@@ -1,5 +1,4 @@
 $here = $PSScriptRoot
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 
 $ProjectPath = "$here\..\..\.." | Convert-Path
 $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
@@ -67,7 +66,7 @@ InModuleScope $ProjectName {
                 $isInClass | Should -Be $true
             }
 
-            It "Should return false for an AST contained in a ScriptBlock`r`n`tthat is a value assignment for a property or method in a class AST" {
+            It "Should return false for an AST contained in a ScriptBlock`r`n`t that is a value assignment for a property or method in a class AST" {
                 $definition = '
                 class Something
                 {

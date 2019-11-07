@@ -22,7 +22,8 @@
    .NOTES
         None
 #>
-function Measure-CatchClause {
+function Measure-CatchClause
+{
     [CmdletBinding()]
     [OutputType([Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]])]
     Param
@@ -33,7 +34,8 @@ function Measure-CatchClause {
         $CatchClauseAst
     )
 
-    try {
+    try
+    {
         $script:diagnosticRecord['Extent'] = $CatchClauseAst.Extent
         $script:diagnosticRecord['RuleName'] = $PSCmdlet.MyInvocation.InvocationName
 
@@ -41,22 +43,26 @@ function Measure-CatchClause {
             StatementBlock = $CatchClauseAst.Extent
         }
 
-        if (Test-StatementOpeningBraceOnSameLine @testParameters) {
+        if (Test-StatementOpeningBraceOnSameLine @testParameters)
+        {
             $script:diagnosticRecord['Message'] = $localizedData.CatchClauseOpeningBraceNotOnSameLine
             $script:diagnosticRecord -as $diagnosticRecordType
         }
 
-        if (Test-StatementOpeningBraceIsNotFollowedByNewLine @testParameters) {
+        if (Test-StatementOpeningBraceIsNotFollowedByNewLine @testParameters)
+        {
             $script:diagnosticRecord['Message'] = $localizedData.CatchClauseOpeningBraceShouldBeFollowedByNewLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
 
-        if (Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine @testParameters) {
+        if (Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine @testParameters)
+        {
             $script:diagnosticRecord['Message'] = $localizedData.CatchClauseOpeningBraceShouldBeFollowedByOnlyOneNewLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
     }
-    catch {
+    catch
+    {
         $PSCmdlet.ThrowTerminatingError($PSItem)
     }
 }

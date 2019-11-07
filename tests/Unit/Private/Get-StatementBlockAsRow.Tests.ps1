@@ -1,5 +1,4 @@
 $here = $PSScriptRoot
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 
 $ProjectPath = "$here\..\..\.." | Convert-Path
 $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
@@ -8,8 +7,8 @@ $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
     ).BaseName
 
 
-Import-Module $ProjectName
 
+Import-Module $ProjectName
 InModuleScope $ProjectName {
     Describe 'Get-StatementBlockAsRow' {
         Context 'When string contains CRLF as new line' {

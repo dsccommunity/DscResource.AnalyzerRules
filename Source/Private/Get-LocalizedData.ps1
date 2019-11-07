@@ -129,7 +129,8 @@ localized message is displayed.
 
 For more information, see about_Script_Internationalization.
 #>
-function Get-LocalizedData {
+function Get-LocalizedData
+{
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
@@ -142,12 +143,15 @@ function Get-LocalizedData {
         [string]
         ${UICulture},
 
+        [Parameter()]
         [string]
         ${BaseDirectory},
 
+        [Parameter()]
         [string]
         ${FileName},
 
+        [Parameter()]
         [string[]]
         ${SupportedCommand},
 
@@ -156,29 +160,36 @@ function Get-LocalizedData {
         ${DefaultUICulture}
     )
 
-    begin {
+    begin
+    {
         # Because Proxy Command changes the Invocation origin, we need to be explicit
         # when handing the pipeline back to original command
-        if (!$PSBoundParameters.ContainsKey('FileName')) {
-            if ($myInvocation.ScriptName) {
+        if (!$PSBoundParameters.ContainsKey('FileName'))
+        {
+            if ($myInvocation.ScriptName)
+            {
                 $file = ([io.FileInfo]$myInvocation.ScriptName)
             }
-            else {
+            else
+            {
                 $file = [io.FileInfo]$myInvocation.MyCommand.Module.Path
             }
             $FileName = $file.BaseName
             $PSBoundParameters.add('FileName', $file.Name)
         }
 
-        if ($PSBoundParameters.ContainsKey('BaseDirectory')) {
+        if ($PSBoundParameters.ContainsKey('BaseDirectory'))
+        {
             $CallingScriptRoot = $BaseDirectory
         }
-        else {
+        else
+        {
             $CallingScriptRoot = $myInvocation.PSScriptRoot
             $PSBoundParameters.add('BaseDirectory', $CallingScriptRoot)
         }
 
-        if ($PSBoundParameters.ContainsKey('DefaultUICulture') -and !$PSBoundParameters.ContainsKey('UICulture')) {
+        if ($PSBoundParameters.ContainsKey('DefaultUICulture') -and !$PSBoundParameters.ContainsKey('UICulture'))
+        {
             # We don't want the resolution to eventually return the ModuleManifest
             # So we run the same GetFilePath() logic than here:
             # https://github.com/PowerShell/PowerShell/blob/master/src/Microsoft.PowerShell.Commands.Utility/commands/utility/Import-LocalizedData.cs#L302-L333
@@ -188,27 +199,33 @@ function Get-LocalizedData {
             $fullFileName = $FileName + ".psd1"
             $LanguageFile = $null
 
-            while ($null -ne $currentCulture -and $currentCulture.Name -and !$LanguageFile) {
+            while ($null -ne $currentCulture -and $currentCulture.Name -and !$LanguageFile)
+            {
                 $filePath = [io.Path]::Combine($CallingScriptRoot, $CurrentCulture.Name, $fullFileName)
-                if (Test-Path $filePath) {
+                if (Test-Path $filePath)
+                {
                     Write-Debug "Found $filePath"
                     $LanguageFile = $filePath
                 }
-                else {
+                else
+                {
                     Write-Debug "File $filePath not found"
                 }
                 $currentCulture = $currentCulture.Parent
             }
 
-            if (!$LanguageFile) {
+            if (!$LanguageFile)
+            {
                 $PSBoundParameters.Add('UICulture', $DefaultUICulture)
             }
             $null = $PSBoundParameters.remove('DefaultUICulture')
         }
 
-        try {
+        try
+        {
             $outBuffer = $null
-            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer)) {
+            if ($PSBoundParameters.TryGetValue('OutBuffer', [ref]$outBuffer))
+            {
                 $PSBoundParameters['OutBuffer'] = 1
             }
 
@@ -218,29 +235,37 @@ function Get-LocalizedData {
             $steppablePipeline = $scriptCmd.GetSteppablePipeline($myInvocation.CommandOrigin)
             $steppablePipeline.Begin($PSCmdlet)
         }
-        catch {
+        catch
+        {
             throw
         }
     }
 
-    process {
-        try {
+    process
+    {
+        try
+        {
             $steppablePipeline.Process($_)
         }
-        catch {
+        catch
+        {
             throw
         }
     }
 
-    end {
-        if ($BindingVariable -and ($valueToBind = Get-Variable -Name $BindingVariable -ValueOnly -ErrorAction Ignore)) {
+    end
+    {
+        if ($BindingVariable -and ($valueToBind = Get-Variable -Name $BindingVariable -ValueOnly -ErrorAction Ignore))
+        {
             # Bringing the variable to the parent scope
             Set-Variable -Scope 1 -Name $BindingVariable -Force -ErrorAction SilentlyContinue -Value $valueToBind
         }
-        try {
+        try
+        {
             $steppablePipeline.End()
         }
-        catch {
+        catch
+        {
             throw
         }
     }
