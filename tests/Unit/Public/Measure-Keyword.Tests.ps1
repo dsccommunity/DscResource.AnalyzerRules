@@ -33,7 +33,7 @@ Describe 'Measure-Keyword' {
                 $record.RuleName | Should -Be $ruleName
             }
 
-            It 'Should ignore DSC keywords' {
+            It 'Should ignore DSC keywords' -Skip:(![bool]$IsWindows) {
                 $definition = '
                     Configuration FileDSC
                     {
@@ -128,7 +128,7 @@ Describe 'Measure-Keyword' {
                     $record.RuleName | Should -Be $ruleName
                 }
 
-                It 'Should ignore DSC keywords' {
+                It 'Should ignore DSC keywords' -Skip:(![bool]$IsWindows) {
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                         Configuration FileDSC
                         {
