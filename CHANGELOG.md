@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Create new module out of the nested one from DscResource.tests
-- used the built custom rules to apply to its own source
+- Used the DSC custom rules from this built module to apply to its own source
 
 ### Changed
 
