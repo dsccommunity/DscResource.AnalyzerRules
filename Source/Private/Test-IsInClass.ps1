@@ -61,24 +61,24 @@ function Test-IsInClass
     {
         # Parent is an Attribute Ast AND
         $inAClass = $Ast.Parent -is [System.Management.Automation.Language.AttributeAst] -and
-            # Grandparent is a Property Member Ast (This Ast Type ONLY shows up inside a TypeDefinitionAst) AND
-            $Ast.Parent.Parent -is [System.Management.Automation.Language.PropertyMemberAst] -and
-            # Great Grandparent is a Type Definition Ast AND
-            $Ast.Parent.Parent.Parent -is [System.Management.Automation.Language.TypeDefinitionAst] -and
-            # Great Grandparent is a Class
-            $ast.Parent.Parent.Parent.IsClass
+        # Grandparent is a Property Member Ast (This Ast Type ONLY shows up inside a TypeDefinitionAst) AND
+        $Ast.Parent.Parent -is [System.Management.Automation.Language.PropertyMemberAst] -and
+        # Great Grandparent is a Type Definition Ast AND
+        $Ast.Parent.Parent.Parent -is [System.Management.Automation.Language.TypeDefinitionAst] -and
+        # Great Grandparent is a Class
+        $ast.Parent.Parent.Parent.IsClass
     }
     # Is a Parameter part of a Class Method?
     elseif ($Ast -is [System.Management.Automation.Language.ParameterAst])
     {
         # Parent is a Function Definition Ast AND
         $inAClass = $Ast.Parent -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
-            # Grandparent is a Function Member Ast (This Ast Type ONLY shows up inside a TypeDefinitionAst) AND
-            $Ast.Parent.Parent -is [System.Management.Automation.Language.FunctionMemberAst] -and
-            # Great Grandparent is a Type Definition Ast AND
-            $Ast.Parent.Parent.Parent -is [System.Management.Automation.Language.TypeDefinitionAst] -and
-            # Great Grandparent is a Class
-            $Ast.Parent.Parent.Parent.IsClass
+        # Grandparent is a Function Member Ast (This Ast Type ONLY shows up inside a TypeDefinitionAst) AND
+        $Ast.Parent.Parent -is [System.Management.Automation.Language.FunctionMemberAst] -and
+        # Great Grandparent is a Type Definition Ast AND
+        $Ast.Parent.Parent.Parent -is [System.Management.Automation.Language.TypeDefinitionAst] -and
+        # Great Grandparent is a Class
+        $Ast.Parent.Parent.Parent.IsClass
     }
 
     $inAClass

@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the [Parameter()] attribute for each parameter.
@@ -24,7 +23,7 @@ function Measure-ParameterBlockParameterAttribute
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
@@ -44,7 +43,7 @@ function Measure-ParameterBlockParameterAttribute
         #>
         if (!$inAClass)
         {
-            if ($ParameterAst.Attributes.TypeName.FullName -notcontains 'parameter')
+            if ($ParameterAst.Attributes.TypeName.FullName -notContains 'parameter')
             {
                 $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockParameterAttributeMissing
 

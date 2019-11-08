@@ -1,18 +1,15 @@
-$here = $PSScriptRoot
-$sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
-
-$ProjectPath = "$here\..\..\.." | Convert-Path
-$ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
+$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
+$ProjectName = ((Get-ChildItem -Path $ProjectPath\*\*.psd1).Where{
         ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-        $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch{$false}) }
-    ).BaseName
+    $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false } )
+    }).BaseName
 
 
 Import-Module $ProjectName
 
 InModuleScope $ProjectName {
     Describe 'Get-LocalizedData' {
-        Context 'When using the default Import-LocalizedData behaviour' {
+        Context 'When using the default Import-LocalizedData behavior' {
             BeforeAll {
                 New-Item -Force -Path 'TestDrive:\ar-SA' -ItemType Directory
                 $null = "
@@ -47,7 +44,7 @@ ParameterBlockParameterAttributeMissing    = A [Parameter()] attribute must be t
             }
 
             It 'Should retrieve the data' {
-                { $data = &'TestDrive:\execute.ps1' } | Should -Not -Throw
+                { $null = &'TestDrive:\execute.ps1' } | Should -Not -Throw
                 &'TestDrive:\execute.ps1' | Should -Not -BeNullOrEmpty
             }
         }

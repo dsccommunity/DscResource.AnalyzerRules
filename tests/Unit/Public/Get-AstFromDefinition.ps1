@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Helper function to return Ast objects,

@@ -87,7 +87,7 @@ $allModuleFunctions = &$mut {Get-Command -Module $args[0] -CommandType Function 
             ParseInput((Get-Content -raw $functionFile.FullName), [ref]$null, [ref]$null)
             $AstSearchDelegate = { $args[0] -is [System.Management.Automation.Language.FunctionDefinitionAst] }
             $ParsedFunction = $AbstractSyntaxTree.FindAll( $AstSearchDelegate, $true ) |
-                ? Name -eq $function.Name
+                Where-Object Name -eq $function.Name
 
             $FunctionHelp = $ParsedFunction.GetHelpContent()
 

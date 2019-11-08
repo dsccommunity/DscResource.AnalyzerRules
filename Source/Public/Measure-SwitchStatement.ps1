@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the switch-statement block braces and new lines around braces.
@@ -23,7 +22,7 @@ function Measure-SwitchStatement
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]

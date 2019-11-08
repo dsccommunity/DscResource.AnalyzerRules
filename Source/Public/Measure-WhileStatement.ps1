@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the while-statement block braces and new lines around braces.
@@ -23,7 +22,7 @@ function Measure-WhileStatement
 {
     [CmdletBinding()]
     [OutputType([Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]])]
-    Param
+    param
     (
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
