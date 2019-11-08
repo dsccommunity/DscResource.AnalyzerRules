@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the catch-clause block braces and new lines around braces.

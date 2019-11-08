@@ -1,13 +1,11 @@
-$here = $PSScriptRoot
-
-$ProjectPath = "$here\..\..\.." | Convert-Path
+$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
 $ProjectName = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
         ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
         $(try { Test-ModuleManifest $_.FullName -ErrorAction Stop }catch{$false}) }
     ).BaseName
 $script:ModuleName = $ProjectName
 
-. $here\Get-AstFromDefinition.ps1
+. $PSScriptRoot\Get-AstFromDefinition.ps1
 
 $ModuleUnderTest = Import-Module $ProjectName -PassThru -Force
 $localizedData = &$ModuleUnderTest { $Script:LocalizedData }

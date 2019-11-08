@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the [Parameter()] attribute for each parameter.

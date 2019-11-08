@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the DoUntil-statement block braces and new lines around braces.

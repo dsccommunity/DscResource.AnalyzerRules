@@ -49,6 +49,8 @@
             with 'Measure*'.
         #>
         'Measure-*'
+        # exclude those files in the problems filter
+        #   !output/RequiredModules**, !build.ps1, tests/**
     )
 
     IncludeDefaultRules = $true

@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the switch-statement block braces and new lines around braces.

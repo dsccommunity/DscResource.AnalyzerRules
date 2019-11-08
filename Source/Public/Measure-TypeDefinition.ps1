@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates the Class and Enum of PowerShell.

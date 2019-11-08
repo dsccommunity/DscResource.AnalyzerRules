@@ -1,4 +1,3 @@
-
 <#
     .SYNOPSIS
         Validates use of the Mandatory named argument within a Parameter attribute.
