@@ -47,6 +47,16 @@ function Measure-Keyword
         {
             $script:diagnosticRecord['Extent'] = $item.Extent
             $script:diagnosticRecord['Message'] = $localizedData.StatementsContainsUpperCaseLetter -f $item.Text
+            $suggestedCorrections = New-Object -TypeName Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]
+            $splat = @{
+                Extent      = $item.Extent
+                NewString   = $item.Text.ToLower()
+                Description = ('Replace {0} with {1}' -f ($item.Extent.Text, $item.Extent.Text.ToLower()))
+            }
+            $suggestedCorrections.Add((New-SuggestedCorrection @splat)) | Out-Null
+            $suggestedCorrections.Add($suggestedCorrection) | Out-Null
+
+            $script:diagnosticRecord['suggestedCorrections'] = $suggestedCorrections
             $script:diagnosticRecord -as $diagnosticRecordType
         }
 
@@ -54,6 +64,15 @@ function Measure-Keyword
         {
             $script:diagnosticRecord['Extent'] = $item.Extent
             $script:diagnosticRecord['Message'] = $localizedData.OneSpaceBetweenKeywordAndParenthesis
+            $suggestedCorrections = New-Object -TypeName Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]
+            $splat = @{
+                Extent      = $item.Extent
+                NewString   = "$($item.Text) "
+                Description = ('Replace {0} with {1}' -f ("$($item.Extent.Text)(", "$($item.Text) ("))
+            }
+            $suggestedCorrections.Add((New-SuggestedCorrection @splat)) | Out-Null
+
+            $script:diagnosticRecord['suggestedCorrections'] = $suggestedCorrections
             $script:diagnosticRecord -as $diagnosticRecordType
         }
     }
