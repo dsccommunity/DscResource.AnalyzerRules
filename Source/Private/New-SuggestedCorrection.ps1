@@ -28,13 +28,16 @@ function New-SuggestedCorrection
         $Description
     )
 
-    [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]::new(
-        $Extent.StartLineNumber,
-        $Extent.EndLineNumber,
-        $Extent.StartColumnNumber,
-        $Extent.EndColumnNumber,
-        $NewString,
-        $Extent.File,
-        $Description
-    )
+    if ($PSCmdlet.ShouldProcess("Create correction extent"))
+    {
+        [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]::new(
+            $Extent.StartLineNumber,
+            $Extent.EndLineNumber,
+            $Extent.StartColumnNumber,
+            $Extent.EndColumnNumber,
+            $NewString,
+            $Extent.File,
+            $Description
+        )
+    }
 }
