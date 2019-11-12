@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Create new module out of the nested one from DscResource.tests
 - Used the DSC custom rules from this built module to apply to its own source
+- Suggested corrections for keyword check
 
 ### Changed
 
