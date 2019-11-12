@@ -44,35 +44,40 @@ function Get-TokensFromDefinition
 
 InModuleScope $ProjectName {
     Describe 'New-SuggestedCorrection tests' {
-        Context 'When suggested correction should be created' {
-            It 'Should create suggested correction' {
-                $definition = '
+            $projectRootPath = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent
+            $moduleRootPath = Join-Path -Path $projectRootPath -ChildPath 'DscResource.AnalyzerRules'
+            $invokeScriptAnalyzerParameters = @{
+                CustomRulePath = $moduleRootPath
+                IncludeRule    = 'Measure-Keyword'
+            }
+
+            Context 'When suggested correction should be created' {
+                It 'Should create suggested correction' {
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                         if("example" -eq "example" -or "magic")
                         {
                             Write-Verbose -Message "Example found."
                         }
                     '
 
-                $token = Get-TokensFromDefinition -ScriptDefinition $definition
-                $record = Measure-Keyword -Token $token
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
 
-                $record.SuggestedCorrections | Should -Exist
+                    $record.SuggestedCorrections | Should -Not -BeNullOrEmpty
+                }
             }
-        }
-        Context 'When suggested correction should not be created' {
-            It 'Should create suggested correction' {
-                $definition = '
-                        if("example" -eq "example" -or "magic")
+            Context 'When suggested correction should not be created' {
+                It 'Should create suggested correction' {
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        if ("example" -eq "example" -or "magic")
                         {
                             Write-Verbose -Message "Example found."
                         }
                     '
 
-                $token = Get-TokensFromDefinition -ScriptDefinition $definition
-                $record = Measure-Keyword -Token $token
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
 
-                $record | Should -Not -Exist
+                    $record | Should -BeNullOrEmpty
+                }
             }
         }
-    }
 }
