@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fix issues with LF by hashtable check.
+
 ### Added
 
 - Create new module out of the nested one from DscResource.tests
