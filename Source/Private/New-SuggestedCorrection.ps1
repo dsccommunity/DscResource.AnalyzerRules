@@ -12,7 +12,7 @@
 #>
 function New-SuggestedCorrection
 {
-    [CmdletBinding(SupportsShouldProcess = $true,ConfirmImpact='None')]
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'None')]
     [OutputType([Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent])]
     param (
         [Parameter(Mandatory = $true)]
@@ -28,17 +28,13 @@ function New-SuggestedCorrection
         $Description
     )
 
-    if ($PSCmdlet.ShouldProcess("Create correction extent"))
-    {
-        [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]::new(
-            $Extent.StartLineNumber,
-            $Extent.EndLineNumber,
-            $Extent.StartColumnNumber,
-            $Extent.EndColumnNumber,
-            $NewString,
-            $Extent.File,
-            $Description
-        )
-    }
-
+    [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]::new(
+        $Extent.StartLineNumber,
+        $Extent.EndLineNumber,
+        $Extent.StartColumnNumber,
+        $Extent.EndColumnNumber,
+        $NewString,
+        $Extent.File,
+        $Description
+    )
 }
