@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Fix issue with DSC composite resources.
 - Fix issues with LF by hashtable check.
 
 ### Added
