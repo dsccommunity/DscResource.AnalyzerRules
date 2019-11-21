@@ -79,7 +79,7 @@ Describe 'Measure-Hashtable' {
         }
 
         Context 'When composite resource is not correctly formatted' {
-            It 'Composite resource defined on a single line' {
+            It 'Composite resource defined on a single line' -Skip:(!([bool]$IsWindows)) {
                 $definition = '
                         configuration test {
                             Script test
@@ -95,7 +95,7 @@ Describe 'Measure-Hashtable' {
                 $record.RuleName | Should -Be $ruleName
             }
 
-            It 'Composite resource partially correct formatted' {
+            It 'Composite resource partially correct formatted' -Skip:(!([bool]$IsWindows)) {
                 $definition = '
                         configuration test {
                             Script test
@@ -113,7 +113,7 @@ Describe 'Measure-Hashtable' {
                 $record.RuleName | Should -Be $ruleName
             }
 
-            It 'Composite resource indentation not correct' {
+            It 'Composite resource indentation not correct' -Skip:(!([bool]$IsWindows)) {
                 $definition = '
                         configuration test {
                             Script test
@@ -179,7 +179,7 @@ Describe 'Measure-Hashtable' {
         }
 
         Context 'When composite resource is correctly formatted' {
-            It "Correctly formatted non-nested hashtable" {
+            It "Correctly formatted non-nested hashtable" -Skip:(!([bool]$IsWindows)) {
                 $definition = '
                         configuration test {
                             Script test
@@ -262,7 +262,7 @@ Describe 'Measure-Hashtable' {
         }
 
         Context 'When composite resource is not correctly formatted' {
-            It 'Composite resource defined on a single line' {
+            It 'Composite resource defined on a single line' -Skip:(!([bool]$IsWindows)) {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                         configuration test {
                             Script test
@@ -278,7 +278,7 @@ Describe 'Measure-Hashtable' {
 
             }
 
-            It 'Composite resource partially correct formatted' {
+            It 'Composite resource partially correct formatted' -Skip:(!([bool]$IsWindows)) {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                         configuration test {
                             Script test
@@ -295,7 +295,7 @@ Describe 'Measure-Hashtable' {
                 $record.RuleName | Should -Be $ruleName
             }
 
-            It 'Composite resource indentation not correct' {
+            It 'Composite resource indentation not correct' -Skip:(!([bool]$IsWindows)) {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                         configuration test {
                             Script test
