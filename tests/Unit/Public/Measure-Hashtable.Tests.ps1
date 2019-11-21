@@ -357,7 +357,7 @@ Describe 'Measure-Hashtable' {
         }
 
         Context 'When composite resource is correctly formatted' {
-            It "Correctly formatted non-nested hashtable" {
+            It "Correctly formatted non-nested hashtable" -Skip:(!([bool]$IsWindows)) {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                         configuration test {
                             Script test
