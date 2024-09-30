@@ -99,6 +99,6 @@ Resolve-Dependency:
 GitHubConfig:
   GitHubFilesToAdd:
     - 'CHANGELOG.md'
-  GitHubConfigUserName: gaelcolas
-  GitHubConfigUserEmail: gaelcolas@synedgy.com
+  GitHubConfigUserName: dscbot # cSpell: disable-line
+  GitHubConfigUserEmail: dsccommunity@outlook.com
   UpdateChangelogOnPrerelease: false
