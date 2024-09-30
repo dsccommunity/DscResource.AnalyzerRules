@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update build files to allow everything to work
 - Update build files to include tasks for deploy
+- Update pipeline to use the correct default branch
 
 ## [0.2.0] - 2019-11-21
 
