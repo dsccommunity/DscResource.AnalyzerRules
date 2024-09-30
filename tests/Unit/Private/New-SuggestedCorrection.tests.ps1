@@ -15,7 +15,7 @@ Import-Module $ProjectName
 InModuleScope $ProjectName {
     Describe 'New-SuggestedCorrection tests' {
         $invokeScriptAnalyzerParameters = @{
-            CustomRulePath = "$PSScriptRoot\..\..\..\output\DscResource.AnalyzerRules" | Convert-Path
+            CustomRulePath = "$PSScriptRoot\..\..\..\output\builtModule\DscResource.AnalyzerRules" | Convert-Path
             IncludeRule    = 'Measure-Keyword'
         }
 

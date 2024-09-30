@@ -44,7 +44,7 @@ PowerShellVersion = '5.1'
 
 # Modules that must be imported into the global environment prior to importing this module
 RequiredModules = @(
-    @{ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.18.3'}
+    @{ModuleName = 'PSScriptAnalyzer'; ModuleVersion = '1.22.0'}
 )
 
 # Assemblies that must be loaded prior to importing this module
