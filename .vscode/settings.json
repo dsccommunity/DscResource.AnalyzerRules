@@ -1,18 +1,60 @@
 {
     "powershell.codeFormatting.openBraceOnSameLine": false,
-    "powershell.codeFormatting.newLineAfterOpenBrace": false,
+    "powershell.codeFormatting.newLineAfterOpenBrace": true,
     "powershell.codeFormatting.newLineAfterCloseBrace": true,
     "powershell.codeFormatting.whitespaceBeforeOpenBrace": true,
     "powershell.codeFormatting.whitespaceBeforeOpenParen": true,
     "powershell.codeFormatting.whitespaceAroundOperator": true,
     "powershell.codeFormatting.whitespaceAfterSeparator": true,
     "powershell.codeFormatting.ignoreOneLineBlock": false,
+    "powershell.codeFormatting.pipelineIndentationStyle": "IncreaseIndentationForFirstPipeline",
     "powershell.codeFormatting.preset": "Custom",
-    "powershell.scriptAnalysis.settingsPath": ".vscode\\analyzersettings.psd1",
+    "powershell.codeFormatting.alignPropertyValuePairs": true,
+    "powershell.codeFormatting.useConstantStrings": true,
+    "powershell.developer.bundledModulesPath": "${cwd}/output/RequiredModules",
+    "powershell.scriptAnalysis.settingsPath": "/.vscode/analyzersettings.psd1",
+    "powershell.scriptAnalysis.enable": true,
     "files.trimTrailingWhitespace": true,
+    "files.trimFinalNewlines": true,
     "files.insertFinalNewline": true,
+    "files.associations": {
+        "*.ps1xml": "xml"
+    },
+    "cSpell.dictionaries": [
+        "powershell"
+    ],
     "cSpell.words": [
+        "COMPANYNAME",
+        "ICONURI",
+        "LICENSEURI",
+        "PROJECTURI",
+        "RELEASENOTES",
+        "buildhelpers",
+        "endregion",
+        "gitversion",
+        "icontains",
+        "keepachangelog",
+        "notin",
+        "pscmdlet",
+        "steppable",
         "dsccommunity",
         "hashtables"
-    ]
+    ],
+    "cSpell.ignorePaths": [
+        ".git"
+    ],
+    "[markdown]": {
+        "files.trimTrailingWhitespace": true,
+        "files.encoding": "utf8"
+    },
+    "powershell.pester.useLegacyCodeLens": false,
+    "pester.testFilePath": [
+        "[tT]ests/[qQ][aA]/*.[tT]ests.[pP][sS]1",
+        "[tT]ests/[uU]nit/**/*.[tT]ests.[pP][sS]1",
+        "[tT]ests/[uU]nit/*.[tT]ests.[pP][sS]1"
+    ],
+    "pester.runTestsInNewProcess": true,
+    "pester.pesterModulePath": "./output/RequiredModules/Pester",
+    "powershell.pester.codeLens": true,
+    "pester.suppressCodeLensNotice": true
 }
