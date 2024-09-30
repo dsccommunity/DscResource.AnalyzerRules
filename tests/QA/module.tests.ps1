@@ -15,25 +15,29 @@ $SourcePath = (Get-ChildItem $ProjectPath\*\*.psd1 | Where-Object {
 $mut = Import-Module -Name $ProjectName -ErrorAction Stop -PassThru -Force
 $allModuleFunctions = &$mut {Get-Command -Module $args[0] -CommandType Function } $ProjectName
 
-    Describe 'Changelog Management' -Tag 'Changelog' {
-        It 'Changelog has been updated' -skip:(
-            !([bool](Get-Command git -EA SilentlyContinue) -and
-              [bool](&(Get-Process -id $PID).Path -NoProfile -Command 'git rev-parse --is-inside-work-tree 2>$null'))
-            ) {
-            # Get the list of changed files compared with master
-            $HeadCommit = &git rev-parse HEAD
-            $MasterCommit = &git rev-parse origin/master
-            $filesChanged = &git diff $MasterCommit...$HeadCommit --name-only
+Describe 'Changelog Management' -Tag 'Changelog' {
+    It 'Changelog has been updated' -skip:(
+        !([bool](Get-Command git -EA SilentlyContinue) -and
+          [bool](&(Get-Process -id $PID).Path -NoProfile -Command 'git rev-parse --is-inside-work-tree 2>$null'))
+        ) {
+        # Get the list of changed files compared with branch main
+        $HeadCommit = &git rev-parse HEAD
+        $defaultBranchCommit = &git rev-parse origin/master
+        $filesChanged = &git @('diff', "$defaultBranchCommit...$HeadCommit", '--name-only')
 
-            if($HeadCommit -ne $MasterCommit) { # if we're not testing same commit (i.e. master..master)
-                $filesChanged.Where{ (Split-Path $_ -Leaf) -match '^changelog' } | Should -Not -BeNullOrEmpty
-            }
-        }
-
-        It 'Changelog format compliant with keepachangelog format' -skip:(![bool](Get-Command git -EA SilentlyContinue)) {
-            { Get-ChangelogData (Join-Path $ProjectPath 'CHANGELOG.md') -ErrorAction Stop } | Should -Not -Throw
+        if($HeadCommit -ne $defaultBranchCommit) { # if we're not testing same commit (i.e. main..main)
+            $filesChanged.Where{ (Split-Path $_ -Leaf) -match '^changelog' } | Should -Not -BeNullOrEmpty
         }
     }
+
+    It 'Changelog format compliant with keepachangelog format' -skip:(![bool](Get-Command git -EA SilentlyContinue)) {
+        { Get-ChangelogData (Join-Path $ProjectPath 'CHANGELOG.md') -ErrorAction Stop } | Should -Not -Throw
+    }
+
+    It 'Changelog should have an Unreleased header' -Skip:$skipTest {
+        (Get-ChangelogData -Path (Join-Path -Path $ProjectPath -ChildPath 'CHANGELOG.md') -ErrorAction 'Stop').Unreleased.RawData | Should -Not -BeNullOrEmpty
+    }
+}
 
     Describe 'General module control' -Tags 'FunctionalQuality' {
 
