@@ -1,31 +1,5 @@
 ---
 ####################################################
-#       Pipeline Configuration                     #
-####################################################
-BuildWorkflow:
-  '.':
-    - build
-    - test
-
-  build:
-    - Clean
-    - Build_Module_ModuleBuilder
-    - Build_NestedModules_ModuleBuilder
-    - Create_changelog_release_output
-
-  pack:
-    - build
-    - package_module_nupkg
-
-  test:
-    - Pester_Tests_Stop_On_Fail
-    - Pester_if_Code_Coverage_Under_Threshold
-
-  publish:
-    - Publish_release_to_GitHub
-    - publish_module_to_gallery
-
-####################################################
 #          ModuleBuilder Configuration             #
 ####################################################
 CopyPaths:
@@ -52,17 +26,33 @@ TaskHeader: |
   ""
 
 ####################################################
-#      ModuleBuilder Submodules Configuration      #
+#       Pipeline Configuration                     #
 ####################################################
+BuildWorkflow:
+  '.':
+    - build
+    - test
 
-# NestedModule:
-#   HelperSubmodule: # This is the first submodule to build into the output
-#     Path: ./Sampler/Modules/HelperSubmodule/HelperSubmodule.psd1
-#     # $ModuleVersionFolder is trimmed (remove -.*) and OutputDirectory expanded (the only one)
-#     OutputDirectory: ./output/Sampler/$ModuleVersionFolder/Modules/HelperSubmodule
-#     VersionedOutputDirectory: false
-#     # suffix:
-#     # prefix:
+  build:
+    - Clean
+    - Build_Module_ModuleBuilder
+    - Build_NestedModules_ModuleBuilder
+    - Create_changelog_release_output
+
+  pack:
+    - build
+    - package_module_nupkg
+
+  test:
+    - Pester_Tests_Stop_On_Fail
+    - Pester_if_Code_Coverage_Under_Threshold
+
+  merge:
+    - Merge_CodeCoverage_Files
+
+  publish:
+    - Publish_release_to_GitHub
+    - publish_module_to_gallery
 
 ####################################################
 #          Pester Configuration (Sampler)          #
