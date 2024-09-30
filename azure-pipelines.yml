@@ -161,6 +161,8 @@ stages:
               summaryFileLocation: 'output/testResults/CodeCov*.xml'
 
       - job: test_macos
+        displayName: 'macOS'
+        timeoutInMinutes: 0
         pool:
           vmImage: 'macos-latest'
         steps:
