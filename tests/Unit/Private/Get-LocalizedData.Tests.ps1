@@ -15,7 +15,7 @@ InModuleScope $ProjectName {
                 $null = "
                     ConvertFrom-StringData @`'
                     # English strings
-                    ParameterBlockParameterAttributeMissing    = A [Parameter()] attribute must be the first attribute of each parameter and be on its own line. See https://github.com/PowerShell/DscResources/blob/master/StyleGuidelines.md#correct-format-for-parameter-block
+                    ParameterBlockParameterAttributeMissing    = A [Parameter()] attribute must be the first attribute of each parameter and be on its own line. See https://dsccommunity.org/styleguidelines/parameters/#correct-format-for-parameter-block
                     '@
                 " | Out-File -Force -FilePath 'TestDrive:\ar-SA\Strings.psd1'
                 "Get-LocalizedData -FileName 'Strings' -EA Stop" |
@@ -36,7 +36,7 @@ InModuleScope $ProjectName {
                 $null = "
 ConvertFrom-StringData @`'
 # ar-SA strings
-ParameterBlockParameterAttributeMissing    = A [Parameter()] attribute must be the first attribute of each parameter and be on its own line. See https://github.com/PowerShell/DscResources/blob/master/StyleGuidelines.md#correct-format-for-parameter-block
+ParameterBlockParameterAttributeMissing    = A [Parameter()] attribute must be the first attribute of each parameter and be on its own line. See https://dsccommunity.org/styleguidelines/parameters/#correct-format-for-parameter-block
 '@
                 " | Out-File -Force -FilePath 'TestDrive:\ar-SA\Strings.psd1'
                 "Get-LocalizedData -FileName 'Strings' -DefaultUICulture 'ar-SA' -EA Stop" |
