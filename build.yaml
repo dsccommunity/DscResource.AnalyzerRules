@@ -75,7 +75,9 @@ Pester:
   ExcludeTag:
     - helpQuality
   Tag:
-  CodeCoverageThreshold: 50 # Set to 0 to bypass
+  CodeCoverageThreshold: 80 # Set to 0 to bypass
+  CodeCoverageOutputFile: JaCoCo_coverage.xml
+  CodeCoverageOutputFileEncoding: ascii
 
 ####################################################
 #              PSDepend Configuration              #
