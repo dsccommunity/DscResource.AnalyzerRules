@@ -218,26 +218,26 @@ stages:
             displayName: 'Download Test Artifact macOS'
             inputs:
               buildType: 'current'
-              artifactName: 'CodeCoverageMacOS_$(System.JobAttempt)'
-              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
+              artifactName: 'CodeCoverageMacOS'
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)/CodeCoverageMacOS'
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Test Artifact Linux'
             inputs:
               buildType: 'current'
-              artifactName: 'CodeCoverageLinux_$(System.JobAttempt)'
-              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
+              artifactName: 'CodeCoverageLinux'
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)/CodeCoverageLinux'
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Test Artifact Windows (PS 5.1)'
             inputs:
               buildType: 'current'
-              artifactName: 'CodeCoverageWinPS51_$(System.JobAttempt)'
-              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
+              artifactName: 'CodeCoverageWinPS51'
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)/CodeCoverageWinPS51'
           - task: DownloadPipelineArtifact@2
             displayName: 'Download Test Artifact Windows (PS7)'
             inputs:
               buildType: 'current'
-              artifactName: 'CodeCoverageWinPS7_$(System.JobAttempt)'
-              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)'
+              artifactName: 'CodeCoverageWinPS7'
+              targetPath: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)/CodeCoverageWinPS7'
           - task: PowerShell@2
             name: merge
             displayName: 'Merge Code Coverage files'
@@ -246,10 +246,10 @@ stages:
               arguments: '-tasks merge'
               pwsh: true
           - task: PublishCodeCoverageResults@1
-            displayName: 'Publish Azure Code Coverage'
+            displayName: 'Publish Code Coverage to Azure DevOps'
             inputs:
               codeCoverageTool: 'JaCoCo'
-              summaryFileLocation: '$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml'
+              summaryFileLocation: '$(Build.SourcesDirectory)/$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml'
               pathToSources: '$(Build.SourcesDirectory)/$(sourceFolderName)/'
           - script: |
               bash <(curl -s https://codecov.io/bash) -f "./$(buildFolderName)/$(testResultFolderName)/JaCoCo_coverage.xml"
