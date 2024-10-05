@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update build files to allow everything to work
 - Update build files to include tasks for deploy
 - Update pipeline to use the correct default branch
+- Update references to dsccommunity fixes [#12](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/12)
+and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
+  - `DscResource.AnalyzerRules.psd1`
+  - `CONTRIBUTING.md`
+  - `Get-LocalizedData.Tests.ps1`
 - `Measure-Keyword.ps1`
   - Update regex in  to match word boundaries. Fixes [#11](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/11).
   - Fix formatting.
