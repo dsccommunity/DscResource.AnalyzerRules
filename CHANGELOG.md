@@ -25,6 +25,10 @@ and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
 - `Get-TokensFromDefinition.ps1`
   - Remove unused variable.
 
+### Changed
+
+- Renamed default branch to `main`. Fixes [#12](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/22).
+
 ## [0.2.0] - 2019-11-21
 
 - Fix issue with DSC composite resources.
