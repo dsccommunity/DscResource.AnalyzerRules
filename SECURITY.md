@@ -3,14 +3,14 @@
 The DSC Community takes the security of our modules seriously, which includes all
 source code repositories managed through our GitHub organization.
 
-If you believe you have found a security vulnerability in SqlServerDsc, please
+If you believe you have found a security vulnerability in DscResource.AnalyzerRules, please
 report it to us as described below.
 
 ## Reporting Security Issues
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-Instead, please create a [security advisory](https://github.com/dsccommunity/SqlServerDsc/security/advisories).
+Instead, please create a [security advisory](https://github.com/dsccommunity/DscResource.AnalyzerRules/security/advisories).
 Then please make one or several members of the DSC Community organization aware
 that you created a security advisory. The easiest way to do so is to send us a
 direct message via twitter or slack.
