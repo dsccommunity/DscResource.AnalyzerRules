@@ -41,6 +41,7 @@ and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
   - Correct url for OneSpaceBetweenKeywordAndParenthesis.
 - `Get-TokensFromDefinition.ps1`
   - Remove unused variable.
+- Renamed 'source' folder to all lower-case characters.
 
 ### Changed
 
