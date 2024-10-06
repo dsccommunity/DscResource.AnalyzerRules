@@ -17,6 +17,13 @@ and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
   - `DscResource.AnalyzerRules.psd1`
   - `CONTRIBUTING.md`
   - `Get-LocalizedData.Tests.ps1`
+- `Measure-Keyword.ps1`
+  - Update regex in  to match word boundaries. Fixes [#11](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/11).
+  - Fix formatting.
+- Localization Strings
+  - Correct url for OneSpaceBetweenKeywordAndParenthesis.
+- `Get-TokensFromDefinition.ps1`
+  - Remove unused variable.
 
 ## [0.2.0] - 2019-11-21
 

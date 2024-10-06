@@ -42,6 +42,6 @@ EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine = Opening brace on Enum should 
 ClassOpeningBraceNotOnSameLine = Class should not have the open brace on the same line as the declaration. See https://dsccommunity.org/styleguidelines/whitespace/#one-newline-before-braces
 ClassOpeningBraceShouldBeFollowedByNewLine = Opening brace on Class should be followed by a new line. See https://dsccommunity.org/styleguidelines/whitespace/#one-newline-after-opening-brace
 ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine = Opening brace on Class should only be followed by one new line. See https://dsccommunity.org/styleguidelines/whitespace/#one-newline-after-opening-brace
-OneSpaceBetweenKeywordAndParenthesis = If a keyword is followed by a parenthesis, there should be single space between the keyword and the parenthesis. See https://dsccommunity.org/styleguidelines/whitespace/#one-newline-after-opening-brace
+OneSpaceBetweenKeywordAndParenthesis = If a keyword is followed by a parenthesis, there should be single space between the keyword and the parenthesis. See https://dsccommunity.org/styleguidelines/whitespace/#one-space-between-keyword-and-parenthesis
 HashtableShouldHaveCorrectFormat = Hashtable is not correctly formatted. See https://dsccommunity.org/styleguidelines/general/#correct-format-for-hashtables-or-objects
 '@
