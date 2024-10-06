@@ -22,7 +22,7 @@ Describe 'Changelog Management' -Tag 'Changelog' {
         ) {
         # Get the list of changed files compared with branch main
         $HeadCommit = &git rev-parse HEAD
-        $defaultBranchCommit = &git rev-parse origin/master
+        $defaultBranchCommit = &git rev-parse origin/main
         $filesChanged = &git @('diff', "$defaultBranchCommit...$HeadCommit", '--name-only')
 
         if($HeadCommit -ne $defaultBranchCommit) { # if we're not testing same commit (i.e. main..main)

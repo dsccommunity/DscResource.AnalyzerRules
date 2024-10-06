@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-    - master
+    - main
   paths:
     include:
     - source/*
@@ -15,7 +15,7 @@ variables:
   buildArtifactName: output
   testResultFolderName: testResults
   sourceFolderName: source
-  defaultBranch: master
+  defaultBranch: main
 
 stages:
   - stage: Build
@@ -260,9 +260,10 @@ stages:
       and(
         succeeded(),
         or(
-          eq(variables['Build.SourceBranch'], 'refs/heads/master'),
+          eq(variables['Build.SourceBranch'], 'refs/heads/main'),
           startsWith(variables['Build.SourceBranch'], 'refs/tags/')
-        )
+        ),
+        contains(variables['System.TeamFoundationCollectionUri'], 'dsccommunity')
       )
     jobs:
       - job: Deploy_Module
