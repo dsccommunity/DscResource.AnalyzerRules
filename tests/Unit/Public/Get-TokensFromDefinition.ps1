@@ -18,7 +18,7 @@ function Get-TokensFromDefinition
     )
 
     $parseErrors = $token = $null
-    $definitionAst = [System.Management.Automation.Language.Parser]::ParseInput($ScriptDefinition, [ref] $token, [ref] $parseErrors)
+    $null = [System.Management.Automation.Language.Parser]::ParseInput($ScriptDefinition, [ref] $token, [ref] $parseErrors)
 
     if ($parseErrors)
     {

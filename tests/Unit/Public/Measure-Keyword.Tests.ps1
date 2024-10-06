@@ -101,6 +101,24 @@ Describe 'Measure-Keyword' {
                 ($record | Measure-Object).Count | Should -Be 0
             }
         }
+
+        Context 'When another word contains ''base'' but has other characters preceeding it' {
+            It 'Should not return an error record' {
+                $definition = '
+                        class SqlSetupBase
+                        {
+                            SqlSetupBase() : base ()
+                            {
+                                Write-Verbose -Message "Example found."
+                            }
+                        }
+                    '
+
+                $token = Get-TokensFromDefinition -ScriptDefinition $definition
+                $record = Measure-Keyword -Token $token
+                ($record | Measure-Object).Count | Should -Be 0
+            }
+        }
     }
 
     Context 'When calling PSScriptAnalyzer' {
@@ -184,6 +202,22 @@ Describe 'Measure-Keyword' {
                             if ("example" -eq "example" -or "magic")
                             {
                                 Write-Verbose -Message "Example found."
+                            }
+                        '
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -Be 0
+                }
+            }
+
+            Context 'When another word contains ''base'' but has other characters preceeding it' {
+                It 'Should not return an error record' {
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            class SqlSetupBase
+                            {
+                                SqlSetupBase() : base ()
+                                {
+                                    Write-Verbose -Message "Example found."
+                                }
                             }
                         '
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
