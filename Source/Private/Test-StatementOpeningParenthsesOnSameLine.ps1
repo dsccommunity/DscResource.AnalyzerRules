@@ -1,11 +1,11 @@
 
 <#
     .SYNOPSIS
-        Helper function for the Measure-*Statement PSScriptAnalyzer rules.
-        Test a single statement block for opening brace on the same line.
+        Helper function for the Measure-*Block PSScriptAnalyzer rules.
+        Test a single statement block for opening parentheses on the same line.
 
     .EXAMPLE
-        Test-StatementOpeningBraceOnSameLine -StatementBlock $ScriptBlockAst.Extent
+        Test-StatementOpeningParenthsesOnSameLine -StatementBlock $ScriptBlockAst.Extent
 
     .INPUTS
         [System.String]
@@ -16,7 +16,8 @@
     .NOTES
         None
 #>
-function Test-StatementOpeningBraceOnSameLine
+
+function Test-StatementOpeningParenthsesOnSameLine
 {
     [CmdletBinding()]
     [OutputType([System.Boolean])]
@@ -31,8 +32,9 @@ function Test-StatementOpeningBraceOnSameLine
     [System.String[]] $statementBlockRows = Get-StatementBlockAsRow -StatementBlock $StatementBlock
     if ($statementBlockRows.Count)
     {
+
         # Check so that an opening brace does not exist on the same line as the statement.
-        if ($statementBlockRows[0] -match '{[\s]*$')
+        if ($statementBlockRows[0] -match '\(')
         {
             return $true
         } # if

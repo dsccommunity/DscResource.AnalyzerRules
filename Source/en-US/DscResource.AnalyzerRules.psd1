@@ -44,4 +44,7 @@ ClassOpeningBraceShouldBeFollowedByNewLine = Opening brace on Class should be fo
 ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine = Opening brace on Class should only be followed by one new line. See https://dsccommunity.org/styleguidelines/whitespace/#one-newline-after-opening-brace
 OneSpaceBetweenKeywordAndParenthesis = If a keyword is followed by a parenthesis, there should be single space between the keyword and the parenthesis. See https://dsccommunity.org/styleguidelines/whitespace/#one-space-between-keyword-and-parenthesis
 HashtableShouldHaveCorrectFormat = Hashtable is not correctly formatted. See https://dsccommunity.org/styleguidelines/general/#correct-format-for-hashtables-or-objects
+ParamBlockEmptyParenthesesShouldBeOnSameLine = If ParamBlock parentheses are empty they should be on the same line. See https://dsccommunity.org/styleguidelines/parameters/#correct-format-for-parameter-block
+ParamBlockEmptyParenthesesShouldNotHaveWhitespace = If ParamBlock parentheses are empty they should not contain whitespace. See https://dsccommunity.org/styleguidelines/parameters/#correct-format-for-parameter-block
+ParamBlockNotEmptyParenthesesShouldBeOnNewLine = If ParamBlock parentheses are not empty they should be on a new line. See https://dsccommunity.org/styleguidelines/parameters/#correct-format-for-parameter-block
 '@

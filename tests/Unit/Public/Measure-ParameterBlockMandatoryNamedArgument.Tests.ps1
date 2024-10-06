@@ -112,7 +112,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory = $false)]
                             $ParameterName
                         )
@@ -131,7 +132,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(mandatory = $true)]
                             $ParameterName
                         )
@@ -150,7 +152,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory)]
                             $ParameterName
                         )
@@ -169,7 +172,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory = $false, ParameterSetName = "SetName")]
                             $ParameterName
                         )
@@ -188,7 +192,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory = $true)]
                             $ParameterName
                         )
@@ -204,7 +209,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(HelpMessage = "HelpMessage")]
                             $ParameterName
                         )
@@ -220,7 +226,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory = $true, ParameterSetName = "SetName")]
                             $ParameterName
                         )
@@ -236,7 +243,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(ParameterSetName = "SetName", Mandatory = $true)]
                             $ParameterName
                         )
@@ -252,7 +260,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory = $true)]
                             [ValidateSet("one", "two")]
                             $ParameterName
@@ -347,7 +356,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory)]
                             $ParameterName1,
 
@@ -369,7 +379,8 @@ Describe 'Measure-ParameterBlockMandatoryNamedArgument' {
                 $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-TargetResource
                     {
-                        param (
+                        param
+                        (
                             [Parameter(Mandatory = $true)]
                             $ParameterName1,
 

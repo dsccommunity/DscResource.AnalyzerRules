@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Add LICENSE.md.
   - Add SECURITY.md
   - Add codecov config.
+- `Measure-ParamBlock` fixes [#13](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/13).
+  - New localization strings.
+  - `Test-StatementEmptyParenthesesHasWhitespace` helper method.
+  - `Test-StatementOpeningParenthsesOnSameLine` helper method.
+  - Fixed type on `Test-StatementOpeningBrace*`.
+  - `Measure-ParameterBlock*` format test data.
 
 ### Fixed
 

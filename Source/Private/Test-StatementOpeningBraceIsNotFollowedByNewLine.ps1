@@ -13,7 +13,7 @@
     .OUTPUTS
         [System.Boolean]
 
-   .NOTES
+    .NOTES
         None
 #>
 function Test-StatementOpeningBraceIsNotFollowedByNewLine
@@ -28,7 +28,7 @@ function Test-StatementOpeningBraceIsNotFollowedByNewLine
         $StatementBlock
     )
 
-    $statementBlockRows = Get-StatementBlockAsRow -StatementBlock $StatementBlock
+    [System.String[]] $statementBlockRows = Get-StatementBlockAsRow -StatementBlock $StatementBlock
     if ($statementBlockRows.Count -ge 2)
     {
         # Check so that an opening brace is followed by a new line.
