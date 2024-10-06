@@ -75,7 +75,12 @@ Pester:
   ExcludeTag:
     - helpQuality
   Tag:
-  CodeCoverageThreshold: 50 # Set to 0 to bypass
+  CodeCoverageThreshold: 80 # Set to 0 to bypass
+  CodeCoverageOutputFileEncoding: ascii
+
+CodeCoverage:
+  CodeCoverageMergedOutputFile: JaCoCo_coverage.xml # the file that is created for the merged code coverage
+  CodeCoverageFilePattern: Codecov*.xml # the pattern used to search all pipeline test job artifacts
 
 ####################################################
 #              PSDepend Configuration              #

@@ -7,11 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Repository Files
+  - Add Issue Template.
+  - Add PR Template.
+  - Add LICENSE.md.
+  - Add SECURITY.md
+  - Add codecov config.
+
 ### Fixed
 
 - Update build files to allow everything to work
 - Update build files to include tasks for deploy
 - Update pipeline to use the correct default branch
+- Repository Files
+  - Update README including badges.
 - Update references to dsccommunity fixes [#12](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/12)
 and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
   - `DscResource.AnalyzerRules.psd1`
