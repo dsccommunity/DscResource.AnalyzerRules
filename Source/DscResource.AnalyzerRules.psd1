@@ -92,13 +92,13 @@ PrivateData = @{
         Tags = @('PSScriptAnalyzer','PSSA','Analyzer','AnalyzerRules','DesiredStateConfiguration', 'DSC', 'DSCResourceKit', 'DSCResource','Windows','MacOS','Linux')
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri   = 'https://github.com/dsccommunity/DscResource.AnalyzerRules/blob/main/LICENSE'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+        ProjectUri   = 'https://github.com/dsccommunity/DscResource.AnalyzerRules'
 
         # A URL to an icon representing this module.
-        # IconUri = ''
+        IconUri      = 'https://dsccommunity.org/images/DSC_Logo_300p.png'
 
         Prerelease = ''
 
