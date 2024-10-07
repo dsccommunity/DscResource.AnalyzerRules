@@ -1,26 +1,74 @@
-$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
-$ProjectName = ((Get-ChildItem -Path $ProjectPath\*\*.psd1).Where{
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-    $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false } )
-    }).BaseName
-$script:ModuleName = $ProjectName
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-. $PSScriptRoot\Get-AstFromDefinition.ps1
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-$ModuleUnderTest = Import-Module $ProjectName -PassThru -Force
-$localizedData = &$ModuleUnderTest { $Script:LocalizedData }
-$modulePath = $ModuleUnderTest.Path
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-Describe 'Measure-CatchClause' {
+BeforeAll {
+    $script:moduleName = 'DscResource.AnalyzerRules'
+
+    # Make sure there are not other modules imported that will conflict with mocks.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Re-import the module using force to get any code changes between runs.
+    $ModuleUnderTest = Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop' -PassThru
+    $script:modulePath = $ModuleUnderTest.Path
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
+}
+
+AfterAll {
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+}
+
+Describe 'Measure-CatchClause' -Tag 'Public' {
     Context 'When calling the function directly' {
         BeforeAll {
-            $astType = 'System.Management.Automation.Language.CatchClauseAst'
-            $ruleName = 'Measure-CatchClause'
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:astType = 'System.Management.Automation.Language.CatchClauseAst'
+                $script:ruleName = 'Measure-CatchClause'
+            }
         }
 
         Context 'When Catch-clause has an opening brace on the same line' {
             It 'Should write the correct error record' {
-                $definition = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $definition = '
                     function Get-Something
                     {
                         try
@@ -33,17 +81,21 @@ Describe 'Measure-CatchClause' {
                     }
                 '
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.CatchClauseOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Catch-clause opening brace is not followed by a new line' {
             It 'Should write the correct error record' {
-                $definition = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $definition = '
                     function Get-Something
                     {
                         try
@@ -56,17 +108,21 @@ Describe 'Measure-CatchClause' {
                     }
                 '
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.CatchClauseOpeningBraceShouldBeFollowedByNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceShouldBeFollowedByNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Catch-clause opening brace is followed by more than one new line' {
             It 'Should write the correct error record' {
-                $definition = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $definition = '
                     function Get-Something
                     {
                         try
@@ -81,11 +137,12 @@ Describe 'Measure-CatchClause' {
                     }
                 '
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.CatchClauseOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
@@ -93,15 +150,26 @@ Describe 'Measure-CatchClause' {
 
     Context 'When calling PSScriptAnalyzer' {
         BeforeAll {
-            $invokeScriptAnalyzerParameters = @{
-                CustomRulePath = $modulePath
+            InModuleScope -Parameters @{
+                ModuleName = $script:moduleName
+                ModulePath = $modulePath
+            } -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:invokeScriptAnalyzerParameters = @{
+                    CustomRulePath = $modulePath
+                }
+
+                $script:ruleName = "$($ModuleName)\Measure-CatchClause"
             }
-            $ruleName = "$($script:ModuleName)\Measure-CatchClause"
         }
 
         Context 'When Catch-clause has an opening brace on the same line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-Something
                     {
                         try
@@ -113,16 +181,20 @@ Describe 'Measure-CatchClause' {
                         }
                     }
                 '
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.CatchClauseOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Catch-clause opening brace is not followed by a new line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-Something
                     {
                         try
@@ -135,16 +207,20 @@ Describe 'Measure-CatchClause' {
                     }
                 '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.CatchClauseOpeningBraceShouldBeFollowedByNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceShouldBeFollowedByNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Catch-clause opening brace is followed by more than one new line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-Something
                     {
                         try
@@ -159,16 +235,20 @@ Describe 'Measure-CatchClause' {
                     }
                 '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.CatchClauseOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Catch-clause follows style guideline' {
             It 'Should not write an error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
+
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
                     function Get-Something
                     {
                         try
@@ -182,8 +262,9 @@ Describe 'Measure-CatchClause' {
                     }
                 '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                $record | Should -BeNullOrEmpty
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    $record | Should -BeNullOrEmpty
+                }
             }
         }
     }
