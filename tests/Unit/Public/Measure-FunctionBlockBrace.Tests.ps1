@@ -1,228 +1,312 @@
-$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
-$ProjectName = ((Get-ChildItem -Path $ProjectPath\*\*.psd1).Where{
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-    $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false } )
-    }).BaseName
-$script:ModuleName = $ProjectName
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-. $PSScriptRoot\Get-AstFromDefinition.ps1
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-$ModuleUnderTest = Import-Module $ProjectName -PassThru
-$localizedData = &$ModuleUnderTest { $Script:LocalizedData }
-$modulePath = $ModuleUnderTest.Path
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
+BeforeAll {
+    $script:moduleName = 'DscResource.AnalyzerRules'
 
-Describe 'Measure-FunctionBlockBrace' {
+    # Make sure there are not other modules imported that will conflict with mocks.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Re-import the module using force to get any code changes between runs.
+    $ModuleUnderTest = Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop' -PassThru
+    $script:modulePath = $ModuleUnderTest.Path
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
+}
+
+AfterAll {
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+}
+
+Describe 'Measure-FunctionBlockBrace' -Tag 'Public' {
     Context 'When calling the function directly' {
         BeforeAll {
-            $astType = 'System.Management.Automation.Language.FunctionDefinitionAst'
-            $ruleName = 'Measure-FunctionBlockBrace'
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:astType = 'System.Management.Automation.Language.FunctionDefinitionAst'
+                $script:ruleName = 'Measure-FunctionBlockBrace'
+            }
         }
 
         Context 'When a functions opening brace is on the same line as the function keyword' {
             It 'Should write the correct error record' {
-                $definition = '
-                    function Get-Something {
-                        [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        return $true
-                    }
-                '
+                    $definition = '
+                        function Get-Something {
+                            [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.FunctionOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                            return $true
+                        }
+                    '
+
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.FunctionOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When function opening brace is not followed by a new line' {
             It 'Should write the correct error record' {
-                $definition = '
-                    function Get-Something
-                    {   [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        return $true
-                    }
-                '
+                    $definition = '
+                        function Get-Something
+                        {   [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.FunctionOpeningBraceShouldBeFollowedByNewLine
-                $record.RuleName | Should -Be $ruleName
+                            return $true
+                        }
+                    '
+
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.FunctionOpeningBraceShouldBeFollowedByNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When function opening brace is followed by more than one new line' {
             It 'Should write the correct error record' {
-                $definition = '
-                    function Get-Something
-                    {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                    $definition = '
+                        function Get-Something
+                        {
 
-                        return $true
-                    }
-                '
+                            [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.FunctionOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                $record.RuleName | Should -Be $ruleName
+                            return $true
+                        }
+                    '
+
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-FunctionBlockBrace -FunctionDefinitionAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.FunctionOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
     }
 
     Context 'When calling PSScriptAnalyzer' {
         BeforeAll {
-            $invokeScriptAnalyzerParameters = @{
-                CustomRulePath = $modulePath
+            InModuleScope -Parameters @{
+                ModuleName = $script:moduleName
+                ModulePath = $modulePath
+            } -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:invokeScriptAnalyzerParameters = @{
+                    CustomRulePath = $modulePath
+                }
+
+                $script:ruleName = "$ModuleName\Measure-FunctionBlockBrace"
             }
-            $ruleName = "$($script:ModuleName)\Measure-FunctionBlockBrace"
         }
 
         Context 'When a functions opening brace is on the same line as the function keyword' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something {
-                        [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        return $true
-                    }
-                '
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something {
+                            [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.FunctionOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                            return $true
+                        }
+                    '
+
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.FunctionOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When two functions has opening brace is on the same line as the function keyword' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something {
-                    }
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                    function Get-SomethingElse {
-                    }
-                '
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something {
+                        }
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 2
-                $record[0].Message | Should -Be $localizedData.FunctionOpeningBraceNotOnSameLine
-                $record[1].Message | Should -Be $localizedData.FunctionOpeningBraceNotOnSameLine
+                        function Get-SomethingElse {
+                        }
+                    '
+
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 2
+                    $record[0].Message | Should -Be $script:localizedData.FunctionOpeningBraceNotOnSameLine
+                    $record[1].Message | Should -Be $script:localizedData.FunctionOpeningBraceNotOnSameLine
+                }
             }
         }
 
         Context 'When function opening brace is not followed by a new line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {   [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        return $true
-                    }
-                '
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
+                        {   [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.FunctionOpeningBraceShouldBeFollowedByNewLine
-                $record.RuleName | Should -Be $ruleName
+                            return $true
+                        }
+                    '
+
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.FunctionOpeningBraceShouldBeFollowedByNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When function opening brace is followed by more than one new line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
+                        {
 
-                        return $true
-                    }
-                '
+                            [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.FunctionOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                $record.RuleName | Should -Be $ruleName
+                            return $true
+                        }
+                    '
+
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.FunctionOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When function follows style guideline' {
             It 'Should not write an error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        [CmdletBinding()]
-                        [OutputType([System.Boolean])]
-                        param
-                        (
-                            [Parameter(Mandatory = $true)]
-                            [ValidateNotNullOrEmpty()]
-                            [System.String]
-                            $Variable1
-                        )
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        return $true
-                    }
-                '
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
+                        {
+                            [CmdletBinding()]
+                            [OutputType([System.Boolean])]
+                            param
+                            (
+                                [Parameter(Mandatory = $true)]
+                                [ValidateNotNullOrEmpty()]
+                                [System.String]
+                                $Variable1
+                            )
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                $record | Should -BeNullOrEmpty
+                            return $true
+                        }
+                    '
+
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    $record | Should -BeNullOrEmpty
+                }
             }
         }
     }

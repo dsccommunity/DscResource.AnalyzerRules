@@ -69,17 +69,17 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $definition = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch {
+                                throw
+                            }
                         }
-                        catch {
-                            throw
-                        }
-                    }
-                '
+                    '
 
                     $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
                     $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
@@ -96,17 +96,17 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $definition = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch
+                            { throw
+                            }
                         }
-                        catch
-                        { throw
-                        }
-                    }
-                '
+                    '
 
                     $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
                     $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
@@ -123,19 +123,19 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $definition = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
-                        }
-                        catch
-                        {
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch
+                            {
 
-                            throw
+                                throw
+                            }
                         }
-                    }
-                '
+                    '
 
                     $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
                     $record = Measure-CatchClause -CatchClauseAst $mockAst[0]
@@ -160,7 +160,7 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     CustomRulePath = $modulePath
                 }
 
-                $script:ruleName = "$($ModuleName)\Measure-CatchClause"
+                $script:ruleName = "$ModuleName\Measure-CatchClause"
             }
         }
 
@@ -170,17 +170,18 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch {
+                                throw
+                            }
                         }
-                        catch {
-                            throw
-                        }
-                    }
-                '
+                    '
+
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     ($record | Measure-Object).Count | Should -BeExactly 1
                     $record.Message | Should -Be $script:localizedData.CatchClauseOpeningBraceNotOnSameLine
@@ -195,17 +196,17 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch
+                            { throw
+                            }
                         }
-                        catch
-                        { throw
-                        }
-                    }
-                '
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     ($record | Measure-Object).Count | Should -BeExactly 1
@@ -221,19 +222,19 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
-                        }
-                        catch
-                        {
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch
+                            {
 
-                            throw
+                                throw
+                            }
                         }
-                    }
-                '
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     ($record | Measure-Object).Count | Should -BeExactly 1
@@ -249,18 +250,18 @@ Describe 'Measure-CatchClause' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        try
+                        function Get-Something
                         {
-                            $value = 1
+                            try
+                            {
+                                $value = 1
+                            }
+                            catch
+                            {
+                                throw
+                            }
                         }
-                        catch
-                        {
-                            throw
-                        }
-                    }
-                '
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     $record | Should -BeNullOrEmpty

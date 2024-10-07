@@ -69,15 +69,15 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $definition = '
-                    function Get-Something
-                    {
-                        $i = 0
+                        function Get-Something
+                        {
+                            $i = 0
 
-                        do {
-                            $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            do {
+                                $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
                     $record = Measure-DoUntilStatement -DoUntilStatementAst $mockAst[0]
@@ -94,15 +94,15 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $definition = '
-                    function Get-Something
-                    {
-                        $i = 0
+                        function Get-Something
+                        {
+                            $i = 0
 
-                        do
-                        { $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            do
+                            { $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
                     $record = Measure-DoUntilStatement -DoUntilStatementAst $mockAst[0]
@@ -119,17 +119,17 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $definition = '
-                    function Get-Something
-                    {
-                        $i = 0
-
-                        do
+                        function Get-Something
                         {
+                            $i = 0
 
-                            $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            do
+                            {
+
+                                $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
                     $record = Measure-DoUntilStatement -DoUntilStatementAst $mockAst[0]
@@ -153,7 +153,7 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     CustomRulePath = $modulePath
                 }
 
-                $script:ruleName = "$($ModuleName)\Measure-DoUntilStatement"
+                $script:ruleName = "$ModuleName\Measure-DoUntilStatement"
             }
         }
 
@@ -163,15 +163,15 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $i = 0
+                        function Get-Something
+                        {
+                            $i = 0
 
-                        do {
-                            $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            do {
+                                $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     ($record | Measure-Object).Count | Should -BeExactly 1
@@ -187,15 +187,15 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $i = 0
+                        function Get-Something
+                        {
+                            $i = 0
 
-                        do
-                        { $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            do
+                            { $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     ($record | Measure-Object).Count | Should -BeExactly 1
@@ -211,17 +211,17 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $i = 0
-
-                        do
+                        function Get-Something
                         {
+                            $i = 0
 
-                            $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            do
+                            {
+
+                                $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     ($record | Measure-Object).Count | Should -BeExactly 1
@@ -237,16 +237,16 @@ Describe 'Measure-DoUntilStatement' -Tag 'Public' {
                     Set-StrictMode -Version 1.0
 
                     $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $i = 0
-
-                        do
+                        function Get-Something
                         {
-                            $i++
-                        } until ($i -eq 2)
-                    }
-                '
+                            $i = 0
+
+                            do
+                            {
+                                $i++
+                            } until ($i -eq 2)
+                        }
+                    '
 
                     $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
                     $record | Should -BeNullOrEmpty
