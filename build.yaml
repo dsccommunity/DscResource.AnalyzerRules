@@ -33,7 +33,7 @@ DscTest:
     ExcludeSourceFile:
       - output
     ExcludeModuleFile:
-    MainGitBranch: master
+    MainGitBranch: main
 
 ModuleBuildTasks:
   Sampler:
