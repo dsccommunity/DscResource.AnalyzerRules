@@ -1,2 +1,2 @@
 # Import Localized Data
-$script:localizedData = Get-LocalizedData -DefaultUICulture 'en-US'
+Get-LocalizedData -BindingVariable 'localizedData' -DefaultUICulture 'en-US'
