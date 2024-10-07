@@ -55,7 +55,6 @@ function Measure-Keyword
                 Description = ('Replace {0} with {1}' -f ($item.Extent.Text, $item.Extent.Text.ToLower()))
             }
             $suggestedCorrections.Add((New-SuggestedCorrection @splat)) | Out-Null
-            $suggestedCorrections.Add($suggestedCorrection) | Out-Null
 
             $script:diagnosticRecord['suggestedCorrections'] = $suggestedCorrections
             $script:diagnosticRecord -as $diagnosticRecordType
