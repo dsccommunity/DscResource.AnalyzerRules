@@ -46,6 +46,7 @@ and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
 ### Changed
 
 - Renamed default branch to `main`. Fixes [#12](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/22).
+- Migrate to Pester 5
 
 ## [0.2.0] - 2019-11-21
 
