@@ -69,9 +69,8 @@ BuildWorkflow:
     - Build_Module_ModuleBuilder
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
-    - build_wiki
 
-  build_wiki:
+  docs:
     - Generate_Wiki_Content
     - Generate_Conceptual_Help
     - Generate_Markdown_For_Public_Commands
@@ -82,10 +81,11 @@ BuildWorkflow:
 
   pack:
     - build
+    - docs
     - package_module_nupkg
 
   hqrmtest:
-    - DscResource_Tests_Stop_On_Fail
+    - Invoke_HQRM_Tests_Stop_On_Fail
 
   test:
     - Pester_Tests_Stop_On_Fail
