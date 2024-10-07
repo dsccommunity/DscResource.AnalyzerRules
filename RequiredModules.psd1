@@ -9,9 +9,10 @@
 
     InvokeBuild           = 'latest'
     PSScriptAnalyzer      = 'latest'
-    pester                = '4.10.1'
+    Pester                = '4.10.1'
     Plaster               = 'latest'
     ModuleBuilder         = 'latest'
     ChangelogManagement   = 'latest'
     Sampler               = 'latest'
+    'Sampler.GitHubTasks' = 'latest'
 }

@@ -13,7 +13,7 @@
     .OUTPUTS
         [System.Boolean]
 
-   .NOTES
+    .NOTES
         None
 #>
 function Test-StatementOpeningBraceOnSameLine
@@ -28,7 +28,7 @@ function Test-StatementOpeningBraceOnSameLine
         $StatementBlock
     )
 
-    $statementBlockRows = Get-StatementBlockAsRow -StatementBlock $StatementBlock
+    [System.String[]] $statementBlockRows = Get-StatementBlockAsRow -StatementBlock $StatementBlock
     if ($statementBlockRows.Count)
     {
         # Check so that an opening brace does not exist on the same line as the statement.

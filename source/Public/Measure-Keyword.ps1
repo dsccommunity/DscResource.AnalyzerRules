@@ -14,9 +14,10 @@
     .OUTPUTS
         [Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]]
 
-   .NOTES
+    .NOTES
         None
 #>
+
 function Measure-Keyword
 {
     [CmdletBinding()]
@@ -41,7 +42,7 @@ function Measure-Keyword
         }
         $upperCaseTokens = $keywords.Where{ $_.Text -cMatch '[A-Z]+' }
 
-        $tokenWithNoSpace = $keywords.Where{ $_.Extent.StartScriptPosition.Line -match "$($_.Extent.Text)\(.*" }
+        $tokenWithNoSpace = $keywords.Where{ $_.Extent.StartScriptPosition.Line -match "\b$($_.Extent.Text)\(.*" }
 
         foreach ($item in $upperCaseTokens)
         {

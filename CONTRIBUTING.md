@@ -6,7 +6,7 @@ change helps make the DSC resources even better for everyone to use.
 ## Common contribution guidelines
 
 This resource module follow all of the common contribution guidelines for
-DSC resource modules [outlined in DscResources repository](https://github.com/PowerShell/DscResources/blob/master/CONTRIBUTING.md),
+DSC resource modules [outlined in DscResources repository](https://dsccommunity.org/guidelines/contributing/),
 so please review these as a baseline for contributing.
 
 ## Specific guidelines for this resource module
@@ -74,7 +74,7 @@ be placed in the resource module file [DscResource.Common](/Modules/DscResource.
 
 ### Localization
 
-Please see the localization section in the [style guideline](https://github.com/PowerShell/DscResources/blob/master/StyleGuidelines.md#localization).
+Please see the localization section in the [style guideline](https://dsccommunity.org/styleguidelines/localization/).
 The helper functions is found in the module [DscResource.LocalizationHelper](/Modules/DscResource.LocalizationHelper/DscResource.LocalizationHelper.psm1).
 
 ### Unit tests
@@ -134,7 +134,7 @@ Invoke-Pester .\DSCResource.Tests\Meta.Tests.ps1
 Integration tests should be written for resources so they can be validated by
 the automated test framework which is run in AppVeyor when commits are pushed
 to a Pull Request (PR).
-Please see the [Testing Guidelines](https://github.com/PowerShell/DscResources/blob/master/TestsGuidelines.md)
+Please see the [Testing Guidelines](https://dsccommunity.org/guidelines/testing-guidelines/)
 for common DSC Resource Kit testing guidelines.
 There are also configurations made by existing integration tests that can be reused
 to write integration tests for other resources. This is documented in the
