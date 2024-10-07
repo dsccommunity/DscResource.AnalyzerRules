@@ -1,95 +1,151 @@
-$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
-$ProjectName = ((Get-ChildItem -Path $ProjectPath\*\*.psd1).Where{
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-    $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false } )
-    }).BaseName
-$script:ModuleName = $ProjectName
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-. $PSScriptRoot\Get-AstFromDefinition.ps1
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-$ModuleUnderTest = Import-Module $ProjectName -PassThru
-$localizedData = &$ModuleUnderTest { $Script:LocalizedData }
-$modulePath = $ModuleUnderTest.Path
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
+BeforeAll {
+    $script:moduleName = 'DscResource.AnalyzerRules'
 
-Describe 'Measure-SwitchStatement' {
+    # Make sure there are not other modules imported that will conflict with mocks.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Re-import the module using force to get any code changes between runs.
+    $ModuleUnderTest = Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop' -PassThru
+    $script:modulePath = $ModuleUnderTest.Path
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
+}
+
+AfterAll {
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+}
+
+Describe 'Measure-SwitchStatement' -Tag 'Public' {
     Context 'When calling the function directly' {
         BeforeAll {
-            $astType = 'System.Management.Automation.Language.SwitchStatementAst'
-            $ruleName = 'Measure-SwitchStatement'
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:astType = 'System.Management.Automation.Language.SwitchStatementAst'
+                $script:ruleName = 'Measure-SwitchStatement'
+            }
         }
 
         Context 'When Switch-statement has an opening brace on the same line' {
             It 'Should write the correct error record' {
-                $definition = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value) {
-                            1
-                            {
-                                ''one''
+                    $definition = '
+                        function Get-Something
+                        {
+                            $value = 1
+
+                            switch ($value) {
+                                1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-SwitchStatement -SwitchStatementAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-SwitchStatement -SwitchStatementAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Switch-statement opening brace is not followed by a new line' {
             It 'Should write the correct error record' {
-                $definition = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value)
-                        {   1
-                            {
-                                ''one''
+                    $definition = '
+                        function Get-Something
+                        {
+                            $value = 1
+
+                            switch ($value)
+                            {   1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-SwitchStatement -SwitchStatementAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceShouldBeFollowedByNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-SwitchStatement -SwitchStatementAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceShouldBeFollowedByNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Switch-statement opening brace is followed by more than one new line' {
             It 'Should write the correct error record' {
-                $definition = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value)
+                    $definition = '
+                        function Get-Something
                         {
+                            $value = 1
 
-                            1
+                            switch ($value)
                             {
-                                ''one''
+
+                                1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                $record = Measure-SwitchStatement -SwitchStatementAst $mockAst[0]
-                ($record | Measure-Object).Count | Should -Be 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                    $record = Measure-SwitchStatement -SwitchStatementAst $mockAst[0]
+                    ($record | Measure-Object).Count | Should -Be 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
@@ -97,123 +153,151 @@ Describe 'Measure-SwitchStatement' {
 
     Context 'When calling PSScriptAnalyzer' {
         BeforeAll {
-            $invokeScriptAnalyzerParameters = @{
-                CustomRulePath = $modulePath
+            InModuleScope -Parameters @{
+                ModuleName = $script:moduleName
+                ModulePath = $modulePath
+            } -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:invokeScriptAnalyzerParameters = @{
+                    CustomRulePath = $modulePath
+                }
+
+                $script:ruleName = "$ModuleName\Measure-SwitchStatement"
             }
-            $ruleName = "$($script:ModuleName)\Measure-SwitchStatement"
         }
 
         Context 'When Switch-statement has an opening brace on the same line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value) {
-                            1
-                            {
-                                ''one''
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
+                        {
+                            $value = 1
+
+                            switch ($value) {
+                                1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         # Regression test.
         Context 'When Switch-statement has an opening brace on the same line, and also has a clause with an opening brace on the same line' {
             It 'Should write only one error record, and the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value) {
-                            1 { ''one'' }
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
+                        {
+                            $value = 1
+
+                            switch ($value) {
+                                1 { ''one'' }
+                            }
                         }
-                    }
-                '
+                    '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceNotOnSameLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceNotOnSameLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Switch-statement opening brace is not followed by a new line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value)
-                        {   1
-                            {
-                                ''one''
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
+                        {
+                            $value = 1
+
+                            switch ($value)
+                            {   1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceShouldBeFollowedByNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceShouldBeFollowedByNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Switch-statement opening brace is followed by more than one new line' {
             It 'Should write the correct error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value)
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
                         {
+                            $value = 1
 
-                            1
+                            switch ($value)
                             {
-                                ''one''
+
+                                1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                ($record | Measure-Object).Count | Should -BeExactly 1
-                $record.Message | Should -Be $localizedData.SwitchStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                $record.RuleName | Should -Be $ruleName
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    ($record | Measure-Object).Count | Should -BeExactly 1
+                    $record.Message | Should -Be $script:localizedData.SwitchStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                    $record.RuleName | Should -Be $ruleName
+                }
             }
         }
 
         Context 'When Switch-statement follows style guideline' {
             It 'Should not write an error record' {
-                $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    function Get-Something
-                    {
-                        $value = 1
+                InModuleScope -ScriptBlock {
+                    Set-StrictMode -Version 1.0
 
-                        switch ($value)
+                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                        function Get-Something
                         {
-                            1
+                            $value = 1
+
+                            switch ($value)
                             {
-                                ''one''
+                                1
+                                {
+                                    ''one''
+                                }
                             }
                         }
-                    }
-                '
+                    '
 
-                $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                $record | Should -BeNullOrEmpty
+                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                    $record | Should -BeNullOrEmpty
+                }
             }
         }
     }

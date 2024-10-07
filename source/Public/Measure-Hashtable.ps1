@@ -47,7 +47,7 @@ function Measure-Hashtable
                 $hashtableLines[-1] -notmatch '\s*}')
             {
                 $script:diagnosticRecord['Extent'] = $hashtable.Extent
-                $script:diagnosticRecord['Message'] = $localizedData.HashtableShouldHaveCorrectFormat
+                $script:diagnosticRecord['Message'] = $script:localizedData.HashtableShouldHaveCorrectFormat
                 $script:diagnosticRecord -as $diagnosticRecordType
             }
             else
@@ -61,7 +61,7 @@ function Measure-Hashtable
                     if ($keyValuePair.Item1.Extent.StartColumnNumber -ne $expectedLineIndent)
                     {
                         $script:diagnosticRecord['Extent'] = $hashtable.Extent
-                        $script:diagnosticRecord['Message'] = $localizedData.HashtableShouldHaveCorrectFormat
+                        $script:diagnosticRecord['Message'] = $script:localizedData.HashtableShouldHaveCorrectFormat
                         $script:diagnosticRecord -as $diagnosticRecordType
                         break
                     }

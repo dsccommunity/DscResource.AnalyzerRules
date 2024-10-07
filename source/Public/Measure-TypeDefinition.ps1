@@ -14,7 +14,7 @@
     .OUTPUTS
         [Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]]
 
-   .NOTES
+    .NOTES
         None
 #>
 function Measure-TypeDefinition
@@ -42,19 +42,19 @@ function Measure-TypeDefinition
         {
             if (Test-StatementOpeningBraceOnSameLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.EnumOpeningBraceNotOnSameLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.EnumOpeningBraceNotOnSameLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
 
             if (Test-StatementOpeningBraceIsNotFollowedByNewLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.EnumOpeningBraceShouldBeFollowedByNewLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.EnumOpeningBraceShouldBeFollowedByNewLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
 
             if (Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
         } # if
@@ -62,19 +62,19 @@ function Measure-TypeDefinition
         {
             if (Test-StatementOpeningBraceOnSameLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ClassOpeningBraceNotOnSameLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.ClassOpeningBraceNotOnSameLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
 
             if (Test-StatementOpeningBraceIsNotFollowedByNewLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ClassOpeningBraceShouldBeFollowedByNewLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.ClassOpeningBraceShouldBeFollowedByNewLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
 
             if (Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
         } # if

@@ -15,7 +15,7 @@
     .OUTPUTS
         [Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]]
 
-   .NOTES
+    .NOTES
         None
 #>
 function Measure-SwitchStatement
@@ -46,18 +46,18 @@ function Measure-SwitchStatement
         #>
         if (Test-StatementOpeningBraceOnSameLine @testParameters)
         {
-            $script:diagnosticRecord['Message'] = $localizedData.SwitchStatementOpeningBraceNotOnSameLine
+            $script:diagnosticRecord['Message'] = $script:localizedData.SwitchStatementOpeningBraceNotOnSameLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
         elseif (Test-StatementOpeningBraceIsNotFollowedByNewLine @testParameters)
         {
-            $script:diagnosticRecord['Message'] = $localizedData.SwitchStatementOpeningBraceShouldBeFollowedByNewLine
+            $script:diagnosticRecord['Message'] = $script:localizedData.SwitchStatementOpeningBraceShouldBeFollowedByNewLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
 
         if (Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine @testParameters)
         {
-            $script:diagnosticRecord['Message'] = $localizedData.SwitchStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
+            $script:diagnosticRecord['Message'] = $script:localizedData.SwitchStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
     }

@@ -53,7 +53,7 @@ function Measure-ParameterBlockMandatoryNamedArgument
                         $value = $NamedAttributeArgumentAst.Argument.SafeGetValue()
                         if ($value -eq $false)
                         {
-                            $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockNonMandatoryParameterMandatoryAttributeWrongFormat
+                            $script:diagnosticRecord['Message'] = $script:localizedData.ParameterBlockNonMandatoryParameterMandatoryAttributeWrongFormat
 
                             $script:diagnosticRecord -as $script:diagnosticRecordType
                         }
@@ -73,7 +73,7 @@ function Measure-ParameterBlockMandatoryNamedArgument
 
                     if ($invalidFormat)
                     {
-                        $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockParameterMandatoryAttributeWrongFormat
+                        $script:diagnosticRecord['Message'] = $script:localizedData.ParameterBlockParameterMandatoryAttributeWrongFormat
 
                         $script:diagnosticRecord -as $script:diagnosticRecordType
                     }

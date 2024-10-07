@@ -45,19 +45,19 @@ function Measure-ParameterBlockParameterAttribute
         {
             if ($ParameterAst.Attributes.TypeName.FullName -notContains 'parameter')
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockParameterAttributeMissing
+                $script:diagnosticRecord['Message'] = $script:localizedData.ParameterBlockParameterAttributeMissing
 
                 $script:diagnosticRecord -as $script:diagnosticRecordType
             }
             elseif ($ParameterAst.Attributes[0].TypeName.FullName -ne 'parameter')
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockParameterAttributeWrongPlace
+                $script:diagnosticRecord['Message'] = $script:localizedData.ParameterBlockParameterAttributeWrongPlace
 
                 $script:diagnosticRecord -as $script:diagnosticRecordType
             }
             elseif ($ParameterAst.Attributes[0].TypeName.FullName -cne 'Parameter')
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ParameterBlockParameterAttributeLowerCase
+                $script:diagnosticRecord['Message'] = $script:localizedData.ParameterBlockParameterAttributeLowerCase
 
                 $script:diagnosticRecord -as $script:diagnosticRecordType
             }

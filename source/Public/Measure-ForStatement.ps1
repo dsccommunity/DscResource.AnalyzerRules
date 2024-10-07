@@ -16,7 +16,7 @@
     .OUTPUTS
         [Microsoft.Windows.Powershell.ScriptAnalyzer.Generic.DiagnosticRecord[]]
 
-   .NOTES
+    .NOTES
         None
 #>
 function Measure-ForStatement
@@ -42,19 +42,19 @@ function Measure-ForStatement
 
         if (Test-StatementOpeningBraceOnSameLine @testParameters)
         {
-            $script:diagnosticRecord['Message'] = $localizedData.ForStatementOpeningBraceNotOnSameLine
+            $script:diagnosticRecord['Message'] = $script:localizedData.ForStatementOpeningBraceNotOnSameLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
 
         if (Test-StatementOpeningBraceIsNotFollowedByNewLine @testParameters)
         {
-            $script:diagnosticRecord['Message'] = $localizedData.ForStatementOpeningBraceShouldBeFollowedByNewLine
+            $script:diagnosticRecord['Message'] = $script:localizedData.ForStatementOpeningBraceShouldBeFollowedByNewLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
 
         if (Test-StatementOpeningBraceIsFollowedByMoreThanOneNewLine @testParameters)
         {
-            $script:diagnosticRecord['Message'] = $localizedData.ForStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
+            $script:diagnosticRecord['Message'] = $script:localizedData.ForStatementOpeningBraceShouldBeFollowedByOnlyOneNewLine
             $script:diagnosticRecord -as $diagnosticRecordType
         } # if
     }

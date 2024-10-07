@@ -43,7 +43,7 @@ function Measure-ParamBlock
         {
             if (Test-StatementOpeningParenthsesOnSameLine @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ParamBlockNotEmptyParenthesesShouldBeOnNewLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.ParamBlockNotEmptyParenthesesShouldBeOnNewLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
         }
@@ -51,13 +51,13 @@ function Measure-ParamBlock
         {
             if (-not (Test-StatementOpeningParenthsesOnSameLine @testParameters))
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ParamBlockEmptyParenthesesShouldBeOnSameLine
+                $script:diagnosticRecord['Message'] = $script:localizedData.ParamBlockEmptyParenthesesShouldBeOnSameLine
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
 
             if (Test-StatementEmptyParenthsesHasWhitespace @testParameters)
             {
-                $script:diagnosticRecord['Message'] = $localizedData.ParamBlockEmptyParenthesesShouldNotHaveWhitespace
+                $script:diagnosticRecord['Message'] = $script:localizedData.ParamBlockEmptyParenthesesShouldNotHaveWhitespace
                 $script:diagnosticRecord -as $diagnosticRecordType
             } # if
         }
