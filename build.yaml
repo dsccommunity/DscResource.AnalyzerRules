@@ -26,12 +26,12 @@ DscTest:
       TestResult:
         Enabled: true
         OutputFormat: NUnitXML
-        OutputPath: ./output/testResults/NUnitXml_DscResourceCommon_HQRM.xml
-        OutputEncoding: UTF-8
-        TestSuiteName: DscResourceCommonHQRM
+        OutputEncoding: ascii
+        OutputPath: ./output/testResults/NUnitXml_HQRM_Tests.xml
   Script:
     ExcludeSourceFile:
       - output
+      - DscResource.AnalyzerRules
     ExcludeModuleFile:
     MainGitBranch: main
 
@@ -40,9 +40,9 @@ ModuleBuildTasks:
     - '*.build.Sampler.ib.tasks'
   Sampler.GitHubTasks:
     - '*.ib.tasks'
-  DscResource.Test:
-    - 'Task.*'
   DscResource.DocGenerator:
+    - 'Task.*'
+  DscResource.Test:
     - 'Task.*'
 
 TaskHeader: |
