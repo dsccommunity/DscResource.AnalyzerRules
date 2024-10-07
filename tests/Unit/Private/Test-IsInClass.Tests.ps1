@@ -1,16 +1,57 @@
-$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
-$ProjectName = ((Get-ChildItem -Path $ProjectPath\*\*.psd1).Where{
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-    $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false } )
-    }).BaseName
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-Import-Module $ProjectName
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
-InModuleScope $ProjectName {
-    Describe 'Test-isInClass' {
-        Context 'Non Class AST' {
-            It 'Should return false for an AST not in a Class AST' {
+BeforeAll {
+    $script:moduleName = 'DscResource.AnalyzerRules'
+
+    # Make sure there are not other modules imported that will conflict with mocks.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Re-import the module using force to get any code changes between runs.
+    Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop'
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
+}
+
+AfterAll {
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+}
+
+Describe 'Test-isInClass' -Tag 'Private' {
+    Context 'Non Class AST' {
+        It 'Should return false for an AST not in a Class AST' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
                 $definition = '
                 function Get-Something
                 {
@@ -26,21 +67,25 @@ InModuleScope $ProjectName {
             '
                 $Ast = [System.Management.Automation.Language.Parser]::ParseInput($definition, [ref] $null, [ref] $null)
                 $ParameterAst = $Ast.Find( {
-                    param
-                    (
-                        [System.Management.Automation.Language.Ast]
-                        $AST
-                    )
-                    $Ast -is [System.Management.Automation.Language.ParameterAst]
-                }, $true)
-                ($ParameterAst -is [System.Management.Automation.Language.ParameterAst]) | Should -Be $true
+                        param
+                        (
+                            [System.Management.Automation.Language.Ast]
+                            $AST
+                        )
+                        $Ast -is [System.Management.Automation.Language.ParameterAst]
+                    }, $true)
+                ($ParameterAst -is [System.Management.Automation.Language.ParameterAst]) | Should -BeTrue
                 $isInClass = Test-isInClass -Ast $ParameterAst
-                $isInClass | Should -Be $false
+                $isInClass | Should -BeFalse
             }
         }
+    }
 
-        Context 'Class AST' {
-            It 'Should Return True for an AST contained in a class AST' {
+    Context 'Class AST' {
+        It 'Should return True for an AST contained in a class AST' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
                 $definition = '
                 class Something
                 {
@@ -52,19 +97,23 @@ InModuleScope $ProjectName {
             '
                 $Ast = [System.Management.Automation.Language.Parser]::ParseInput($definition, [ref] $null, [ref] $null)
                 $ParameterAst = $Ast.Find( {
-                    param
-                    (
-                        [System.Management.Automation.Language.Ast]
-                        $AST
-                    )
-                    $Ast -is [System.Management.Automation.Language.ParameterAst]
-                }, $true)
-                ($ParameterAst -is [System.Management.Automation.Language.ParameterAst]) | Should -Be $true
+                        param
+                        (
+                            [System.Management.Automation.Language.Ast]
+                            $AST
+                        )
+                        $Ast -is [System.Management.Automation.Language.ParameterAst]
+                    }, $true)
+                ($ParameterAst -is [System.Management.Automation.Language.ParameterAst]) | Should -BeTrue
                 $isInClass = Test-isInClass -Ast $ParameterAst
-                $isInClass | Should -Be $true
+                $isInClass | Should -BeTrue
             }
+        }
 
-            It "Should return false for an AST contained in a ScriptBlock`r`n`t that is a value assignment for a property or method in a class AST" {
+        It 'Should return false for an AST contained in a ScriptBlock that is a value assignment for a property or method in a class AST' {
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
                 $definition = '
                 class Something
                 {
@@ -81,17 +130,16 @@ InModuleScope $ProjectName {
             '
                 $Ast = [System.Management.Automation.Language.Parser]::ParseInput($definition, [ref] $null, [ref] $null)
                 $ParameterAst = $Ast.Find( {
-                    param
-                    (
-                        [System.Management.Automation.Language.Ast]
-                        $AST
-                    )
-                    $Ast -is [System.Management.Automation.Language.ParameterAst]
-                }, $true)
-                ($ParameterAst -is [System.Management.Automation.Language.ParameterAst]) | Should -Be $true
+                        param
+                        (
+                            [System.Management.Automation.Language.Ast]
+                            $AST
+                        )
+                        $Ast -is [System.Management.Automation.Language.ParameterAst]
+                    }, $true)
+                ($ParameterAst -is [System.Management.Automation.Language.ParameterAst]) | Should -BeTrue
                 $isInClass = Test-isInClass -Ast $ParameterAst
-                $isInClass | Should -Be $false
-
+                $isInClass | Should -BeFalse
             }
         }
     }

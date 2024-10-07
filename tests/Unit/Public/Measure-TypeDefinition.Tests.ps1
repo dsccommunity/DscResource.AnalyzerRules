@@ -1,74 +1,131 @@
-$ProjectPath = "$PSScriptRoot\..\..\.." | Convert-Path
-$ProjectName = ((Get-ChildItem -Path $ProjectPath\*\*.psd1).Where{
-        ($_.Directory.Name -match 'source|src' -or $_.Directory.Name -eq $_.BaseName) -and
-    $(try { Test-ModuleManifest -Path $_.FullName -ErrorAction Stop } catch { $false } )
-    }).BaseName
-$script:ModuleName = $ProjectName
+[System.Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+param ()
 
-. $PSScriptRoot\Get-AstFromDefinition.ps1
+BeforeDiscovery {
+    try
+    {
+        if (-not (Get-Module -Name 'DscResource.Test'))
+        {
+            # Assumes dependencies has been resolved, so if this module is not available, run 'noop' task.
+            if (-not (Get-Module -Name 'DscResource.Test' -ListAvailable))
+            {
+                # Redirect all streams to $null, except the error stream (stream 2)
+                & "$PSScriptRoot/../../build.ps1" -Tasks 'noop' 2>&1 4>&1 5>&1 6>&1 > $null
+            }
 
-$ModuleUnderTest = Import-Module $ProjectName -PassThru
-$localizedData = &$ModuleUnderTest { $Script:LocalizedData }
-$modulePath = $ModuleUnderTest.Path
+            # If the dependencies has not been resolved, this will throw an error.
+            Import-Module -Name 'DscResource.Test' -Force -ErrorAction 'Stop'
+        }
+    }
+    catch [System.IO.FileNotFoundException]
+    {
+        throw 'DscResource.Test module dependency not found. Please run ".\build.ps1 -ResolveDependency -Tasks build" first.'
+    }
+}
 
+BeforeAll {
+    $script:moduleName = 'DscResource.AnalyzerRules'
 
-Describe 'Measure-TypeDefinition' {
+    # Make sure there are not other modules imported that will conflict with mocks.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Re-import the module using force to get any code changes between runs.
+    $ModuleUnderTest = Import-Module -Name $script:moduleName -Force -ErrorAction 'Stop' -PassThru
+    $script:modulePath = $ModuleUnderTest.Path
+
+    Import-Module -Name (Join-Path -Path $PSScriptRoot -ChildPath '..\..\TestHelpers\CommonTestHelper.psm1')
+
+    $PSDefaultParameterValues['InModuleScope:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Mock:ModuleName'] = $script:moduleName
+    $PSDefaultParameterValues['Should:ModuleName'] = $script:moduleName
+}
+
+AfterAll {
+    $PSDefaultParameterValues.Remove('Mock:ModuleName')
+    $PSDefaultParameterValues.Remove('InModuleScope:ModuleName')
+    $PSDefaultParameterValues.Remove('Should:ModuleName')
+
+    # Unload the module being tested so that it doesn't impact any other tests.
+    Get-Module -Name $script:moduleName -All | Remove-Module -Force
+
+    # Remove module common test helper.
+    Get-Module -Name 'CommonTestHelper' -All | Remove-Module -Force
+}
+
+Describe 'Measure-TypeDefinition' -Tag 'Public' {
     Context 'When calling the function directly' {
         BeforeAll {
-            $astType = 'System.Management.Automation.Language.TypeDefinitionAst'
-            $ruleName = 'Measure-TypeDefinition'
+            InModuleScope -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:astType = 'System.Management.Automation.Language.TypeDefinitionAst'
+                $script:ruleName = 'Measure-TypeDefinition'
+            }
         }
 
         Context 'Enum' {
             Context 'When Enum has an opening brace on the same line' {
                 It 'Should write the correct error record' {
-                    $definition = '
-                        enum Test {
-                            Good
-                            Bad
-                        }
-                    '
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                    $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
-                    ($record | Measure-Object).Count | Should -Be 1
-                    $record.Message | Should -Be $localizedData.EnumOpeningBraceNotOnSameLine
-                    $record.RuleName | Should -Be $ruleName
+                        $definition = '
+                            enum Test {
+                                Good
+                                Bad
+                            }
+                        '
+
+                        $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                        $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
+                        ($record | Measure-Object).Count | Should -Be 1
+                        $record.Message | Should -Be $script:localizedData.EnumOpeningBraceNotOnSameLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Enum Opening brace is not followed by a new line' {
                 It 'Should write the correct error record' {
-                    $definition = '
-                        enum Test
-                        { Good
-                            Bad
-                        }
-                    '
-                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                    $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
-                    ($record | Measure-Object).Count | Should -Be 1
-                    $record.Message | Should -Be $localizedData.EnumOpeningBraceShouldBeFollowedByNewLine
-                    $record.RuleName | Should -Be $ruleName
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
+
+                        $definition = '
+                            enum Test
+                            { Good
+                                Bad
+                            }
+                        '
+
+                        $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                        $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
+                        ($record | Measure-Object).Count | Should -Be 1
+                        $record.Message | Should -Be $script:localizedData.EnumOpeningBraceShouldBeFollowedByNewLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Enum opening brace is followed by more than one new line' {
                 It 'Should write the correct error record' {
-                    $definition = '
-                        enum Test
-                        {
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                            Good
-                            Bad
-                        }
-                    '
+                        $definition = '
+                            enum Test
+                            {
 
-                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                    $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
-                    ($record | Measure-Object).Count | Should -Be 1
-                    $record.Message | Should -Be $localizedData.EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                    $record.RuleName | Should -Be $ruleName
+                                Good
+                                Bad
+                            }
+                        '
+
+                        $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                        $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
+                        ($record | Measure-Object).Count | Should -Be 1
+                        $record.Message | Should -Be $script:localizedData.EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
         }
@@ -76,60 +133,72 @@ Describe 'Measure-TypeDefinition' {
         Context 'Class' {
             Context 'When Class has an opening brace on the same line' {
                 It 'Should write the correct error record' {
-                    $definition = '
-                        class Test {
-                            [int] $Good
-                            [Void] Bad()
-                            {
-                            }
-                        }
-                    '
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                    $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
-                    ($record | Measure-Object).Count | Should -Be 1
-                    $record.Message | Should -Be $localizedData.ClassOpeningBraceNotOnSameLine
-                    $record.RuleName | Should -Be $ruleName
+                            $definition = '
+                            class Test {
+                                [int] $Good
+                                [Void] Bad()
+                                {
+                                }
+                            }
+                        '
+
+                        $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                        $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
+                        ($record | Measure-Object).Count | Should -Be 1
+                        $record.Message | Should -Be $script:localizedData.ClassOpeningBraceNotOnSameLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Class Opening brace is not followed by a new line' {
                 It 'Should write the correct error record' {
-                    $definition = '
-                        class Test
-                        {   [int] $Good
-                            [Void] Bad()
-                            {
-                            }
-                        }
-                    '
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                    $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
-                    ($record | Measure-Object).Count | Should -Be 1
-                    $record.Message | Should -Be $localizedData.ClassOpeningBraceShouldBeFollowedByNewLine
-                    $record.RuleName | Should -Be $ruleName
+                        $definition = '
+                            class Test
+                            {   [int] $Good
+                                [Void] Bad()
+                                {
+                                }
+                            }
+                        '
+
+                        $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                        $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
+                        ($record | Measure-Object).Count | Should -Be 1
+                        $record.Message | Should -Be $script:localizedData.ClassOpeningBraceShouldBeFollowedByNewLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Class opening brace is followed by more than one new line' {
                 It 'Should write the correct error record' {
-                    $definition = '
-                        class Test
-                        {
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                            [int] $Good
-                            [Void] Bad()
+                        $definition = '
+                            class Test
                             {
-                            }
-                        }
-                    '
 
-                    $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
-                    $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
-                    ($record | Measure-Object).Count | Should -Be 1
-                    $record.Message | Should -Be $localizedData.ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                    $record.RuleName | Should -Be $ruleName
+                                [int] $Good
+                                [Void] Bad()
+                                {
+                                }
+                            }
+                        '
+
+                        $mockAst = Get-AstFromDefinition -ScriptDefinition $definition -AstType $astType
+                        $record = Measure-TypeDefinition -TypeDefinitionAst $mockAst[0]
+                        ($record | Measure-Object).Count | Should -Be 1
+                        $record.Message | Should -Be $script:localizedData.ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
         }
@@ -137,59 +206,80 @@ Describe 'Measure-TypeDefinition' {
 
     Context 'When calling PSScriptAnalyzer' {
         BeforeAll {
-            $invokeScriptAnalyzerParameters = @{
-                CustomRulePath = $modulePath
+            InModuleScope -Parameters @{
+                ModuleName = $script:moduleName
+                ModulePath = $modulePath
+            } -ScriptBlock {
+                Set-StrictMode -Version 1.0
+
+                $script:invokeScriptAnalyzerParameters = @{
+                    CustomRulePath = $modulePath
+                }
+
+                $script:ruleName = "$ModuleName\Measure-TypeDefinition"
             }
-            $ruleName = "$($script:ModuleName)\Measure-TypeDefinition"
         }
 
         Context 'Enum' {
             Context 'When Enum has an opening brace on the same line' {
                 It 'Should write the correct error record' {
-                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    enum Test {
-                        Good
-                        Bad
-                    }
-                '
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                    ($record | Measure-Object).Count | Should -BeExactly 1
-                    $record.Message | Should -Be $localizedData.EnumOpeningBraceNotOnSameLine
-                    $record.RuleName | Should -Be $ruleName
+                        $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            enum Test {
+                                Good
+                                Bad
+                            }
+                        '
+
+                        $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                        ($record | Measure-Object).Count | Should -BeExactly 1
+                        $record.Message | Should -Be $script:localizedData.EnumOpeningBraceNotOnSameLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Enum Opening brace is not followed by a new line' {
                 It 'Should write the correct error record' {
-                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    enum Test
-                    { Good
-                        Bad
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
+
+                        $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            enum Test
+                            { Good
+                                Bad
+                            }
+                        '
+
+                        $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                        ($record | Measure-Object).Count | Should -BeExactly 1
+                        $record.Message | Should -Be $script:localizedData.EnumOpeningBraceShouldBeFollowedByNewLine
+                        $record.RuleName | Should -Be $ruleName
                     }
-                '
-                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                    ($record | Measure-Object).Count | Should -BeExactly 1
-                    $record.Message | Should -Be $localizedData.EnumOpeningBraceShouldBeFollowedByNewLine
-                    $record.RuleName | Should -Be $ruleName
                 }
             }
 
             Context 'When Enum opening brace is followed by more than one new line' {
                 It 'Should write the correct error record' {
-                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    enum Test
-                    {
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                        Good
-                        Bad
+                        $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            enum Test
+                            {
+
+                                Good
+                                Bad
+                            }
+                        '
+
+                        $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                        ($record | Measure-Object).Count | Should -BeExactly 1
+                        $record.Message | Should -Be $script:localizedData.EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                        $record.RuleName | Should -Be $ruleName
                     }
-                '
-
-                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                    ($record | Measure-Object).Count | Should -BeExactly 1
-                    $record.Message | Should -Be $localizedData.EnumOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                    $record.RuleName | Should -Be $ruleName
                 }
             }
         }
@@ -197,57 +287,69 @@ Describe 'Measure-TypeDefinition' {
         Context 'Class' {
             Context 'When Class has an opening brace on the same line' {
                 It 'Should write the correct error record' {
-                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    class Test {
-                        [int] $Good
-                        [Void] Bad()
-                        {
-                        }
-                    }
-                '
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                    ($record | Measure-Object).Count | Should -BeExactly 1
-                    $record.Message | Should -Be $localizedData.ClassOpeningBraceNotOnSameLine
-                    $record.RuleName | Should -Be $ruleName
+                        $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            class Test {
+                                [int] $Good
+                                [Void] Bad()
+                                {
+                                }
+                            }
+                        '
+
+                        $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                        ($record | Measure-Object).Count | Should -BeExactly 1
+                        $record.Message | Should -Be $script:localizedData.ClassOpeningBraceNotOnSameLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Class Opening brace is not followed by a new line' {
                 It 'Should write the correct error record' {
-                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    class Test
-                    {   [int] $Good
-                        [Void] Bad()
-                        {
-                        }
-                    }
-                '
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                    ($record | Measure-Object).Count | Should -BeExactly 1
-                    $record.Message | Should -Be $localizedData.ClassOpeningBraceShouldBeFollowedByNewLine
-                    $record.RuleName | Should -Be $ruleName
+                        $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            class Test
+                            {   [int] $Good
+                                [Void] Bad()
+                                {
+                                }
+                            }
+                        '
+
+                        $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                        ($record | Measure-Object).Count | Should -BeExactly 1
+                        $record.Message | Should -Be $script:localizedData.ClassOpeningBraceShouldBeFollowedByNewLine
+                        $record.RuleName | Should -Be $ruleName
+                    }
                 }
             }
 
             Context 'When Class opening brace is followed by more than one new line' {
                 It 'Should write the correct error record' {
-                    $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
-                    class Test
-                    {
+                    InModuleScope -ScriptBlock {
+                        Set-StrictMode -Version 1.0
 
-                        [int] $Good
-                        [Void] Bad()
-                        {
-                        }
+                        $invokeScriptAnalyzerParameters['ScriptDefinition'] = '
+                            class Test
+                            {
+
+                                [int] $Good
+                                [Void] Bad()
+                                {
+                                }
+                            }
+                        '
+
+                        $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
+                        ($record | Measure-Object).Count | Should -BeExactly 1
+                        $record.Message | Should -Be $script:localizedData.ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine
+                        $record.RuleName | Should -Be $ruleName
                     }
-                '
-
-                    $record = Invoke-ScriptAnalyzer @invokeScriptAnalyzerParameters
-                    ($record | Measure-Object).Count | Should -BeExactly 1
-                    $record.Message | Should -Be $localizedData.ClassOpeningBraceShouldBeFollowedByOnlyOneNewLine
-                    $record.RuleName | Should -Be $ruleName
                 }
             }
         }

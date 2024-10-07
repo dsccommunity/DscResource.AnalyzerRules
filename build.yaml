@@ -40,9 +40,9 @@ ModuleBuildTasks:
     - '*.build.Sampler.ib.tasks'
   Sampler.GitHubTasks:
     - '*.ib.tasks'
-  DscResource.DocGenerator:
-    - 'Task.*'
   DscResource.Test:
+    - 'Task.*'
+  DscResource.DocGenerator:
     - 'Task.*'
 
 TaskHeader: |
@@ -89,6 +89,7 @@ BuildWorkflow:
 
   test:
     - Pester_Tests_Stop_On_Fail
+    - Convert_Pester_Coverage
     - Pester_if_Code_Coverage_Under_Threshold
 
   merge:
@@ -103,22 +104,31 @@ BuildWorkflow:
 #          Pester Configuration (Sampler)          #
 ####################################################
 Pester:
-  OutputFormat: NUnitXML
-  # Will look at every *.ps1 & *.psm1 under ModulePath, excepts when $_.FullName -match (Join-Path $ProjectPath $ExcludeFromCodeCoverageItem)
+  Configuration:
+    Run:
+      Path:
+        - tests/QA
+        - tests/Unit
+    Output:
+      Verbosity: Detailed
+      StackTraceVisibility: Full
+      CIFormat: Auto
+    CodeCoverage:
+      CoveragePercentTarget: 80
+      OutputEncoding: ascii
+      UseBreakpoints: false
   ExcludeFromCodeCoverage:
     - tasks
     - Template
-  # Default is to use the tests folder in the project folder or source folder (if present)
-  # can use it to prioritize: tests/QA, tests/Unit, tests/Integration
-  Script:
-  # - tests/QA/module.tests.ps1
-  # - tests/QA
-  # - tests/Unit
-  # - tests/Integration
   ExcludeTag:
     - helpQuality
-  Tag:
-  CodeCoverageThreshold: 50 # Set to 0 to bypass
+
+####################################################
+#           Code Coverage Configuration            #
+####################################################
+CodeCoverage:
+  CodeCoverageMergedOutputFile: JaCoCo_coverage.xml # the file that is created for the merged code coverage
+  CodeCoverageFilePattern: Codecov*.xml # the pattern used to search all pipeline test job artifacts
 
 ####################################################
 #              PSDepend Configuration              #
