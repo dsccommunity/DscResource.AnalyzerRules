@@ -47,7 +47,7 @@ function Measure-Keyword
         foreach ($item in $upperCaseTokens)
         {
             $script:diagnosticRecord['Extent'] = $item.Extent
-            $script:diagnosticRecord['Message'] = $localizedData.StatementsContainsUpperCaseLetter -f $item.Text
+            $script:diagnosticRecord['Message'] = $script:localizedData.StatementsContainsUpperCaseLetter -f $item.Text
             $suggestedCorrections = New-Object -TypeName Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]
             $splat = @{
                 Extent      = $item.Extent
@@ -64,7 +64,7 @@ function Measure-Keyword
         foreach ($item in $tokenWithNoSpace)
         {
             $script:diagnosticRecord['Extent'] = $item.Extent
-            $script:diagnosticRecord['Message'] = $localizedData.OneSpaceBetweenKeywordAndParenthesis
+            $script:diagnosticRecord['Message'] = $script:localizedData.OneSpaceBetweenKeywordAndParenthesis
             $suggestedCorrections = New-Object -TypeName Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]
             $splat = @{
                 Extent      = $item.Extent
