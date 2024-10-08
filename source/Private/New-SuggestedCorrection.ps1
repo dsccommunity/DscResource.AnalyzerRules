@@ -14,7 +14,8 @@ function New-SuggestedCorrection
 {
     [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'None')]
     [OutputType([Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent])]
-    param (
+    param
+    (
         [Parameter(Mandatory = $true)]
         [System.Management.Automation.Language.IScriptExtent]
         $Extent,

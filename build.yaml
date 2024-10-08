@@ -10,11 +10,38 @@ Encoding: UTF8
 VersionedOutputDirectory: true
 BuiltModuleSubdirectory: builtModule
 
+####################################################
+#             HQRM Test Configuration              #
+####################################################
+DscTest:
+  Pester:
+    Configuration:
+      Filter:
+        Tag:
+        ExcludeTag:
+          - Common Tests - New Error-Level Script Analyzer Rules
+      Output:
+        Verbosity: Detailed
+        CIFormat: Auto
+      TestResult:
+        Enabled: true
+        OutputFormat: NUnitXML
+        OutputEncoding: ascii
+        OutputPath: ./output/testResults/NUnitXml_HQRM_Tests.xml
+  Script:
+    ExcludeSourceFile:
+      - output
+      - DscResource.AnalyzerRules
+    ExcludeModuleFile:
+    MainGitBranch: main
+
 ModuleBuildTasks:
   Sampler:
     - '*.build.Sampler.ib.tasks'
   Sampler.GitHubTasks:
     - '*.ib.tasks'
+  DscResource.DocGenerator:
+    - 'Task.*'
   DscResource.Test:
     - 'Task.*'
 
@@ -43,9 +70,22 @@ BuildWorkflow:
     - Build_NestedModules_ModuleBuilder
     - Create_changelog_release_output
 
+  docs:
+    - Generate_Wiki_Content
+    - Generate_Conceptual_Help
+    - Generate_Markdown_For_Public_Commands
+    - Generate_External_Help_File_For_Public_Commands
+    - Clean_Markdown_Of_Public_Commands
+    - Generate_Wiki_Sidebar
+    - Clean_Markdown_Metadata
+
   pack:
     - build
+    - docs
     - package_module_nupkg
+
+  hqrmtest:
+    - Invoke_HQRM_Tests_Stop_On_Fail
 
   test:
     - Pester_Tests_Stop_On_Fail
@@ -58,6 +98,7 @@ BuildWorkflow:
   publish:
     - Publish_Release_To_GitHub
     - Publish_Module_To_gallery
+    - Publish_GitHub_Wiki_Content
 
 ####################################################
 #          Pester Configuration (Sampler)          #
@@ -106,3 +147,31 @@ GitHubConfig:
   GitHubConfigUserName: dscbot # cSpell: disable-line
   GitHubConfigUserEmail: dsccommunity@outlook.com
   UpdateChangelogOnPrerelease: false
+
+####################################################
+#      DscResource.DocGenerator Configuration      #
+####################################################
+DscResource.DocGenerator:
+  Generate_Conceptual_Help:
+    MarkdownCodeRegularExpression:
+      - '\`(.+?)\`' # Match inline code-block
+      - '\\(\\)' # Match escaped backslash
+      - '\[[^\[]+\]\((.+?)\)' # Match markdown URL
+      - '_(.+?)_' # Match Italic (underscore)
+      - '\*\*(.+?)\*\*' # Match bold
+      - '\*(.+?)\*' # Match Italic (asterisk)
+  Publish_GitHub_Wiki_Content:
+    Debug: true
+  Generate_Wiki_Content:
+    MofResourceMetadata:
+      Type: MofResource
+      Category: Resources
+    ClassResourceMetadata:
+      Type: ClassResource
+      Category: Resources
+    CompositeResourceMetadata:
+      Type: CompositeResource
+      Category: Resources
+  Generate_Wiki_Sidebar:
+    Debug: false
+    AlwaysOverwrite: true

@@ -29,3 +29,8 @@ guidelines.
 ## Change log
 
 A full list of changes in each version can be found in the [change log](CHANGELOG.md).
+
+## Documentation
+
+The documentation can be found in the [DscResource.AnalyzerRules Wiki](https://github.com/dsccommunity/DscResource.AnalyzerRules/wiki).
+The documentation is automatically updated on each PR merge.

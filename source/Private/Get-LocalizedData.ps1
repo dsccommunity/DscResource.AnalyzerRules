@@ -133,7 +133,8 @@
 function Get-LocalizedData
 {
     [CmdletBinding()]
-    param (
+    param
+    (
         [Parameter(Position = 0)]
         [Alias('Variable')]
         [ValidateNotNullOrEmpty()]
