@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `Measure-ParameterBlock*` format test data.
 - Enable generated docs with `DscResource.DocGenerator`
 - Add HQRM checks
+- Add wiki documentation for usage
 
 ### Fixed
 
