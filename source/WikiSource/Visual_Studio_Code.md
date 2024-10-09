@@ -8,7 +8,7 @@ These analyzer rules can be used in a project being developed in Visual Studio C
 It requires that some settings are set for both Visual Studio Code and PSScriptAnalyzer.
 
 It also assumed the latest version of PSScriptAnalyzer is installed in a `$PSModulePath`.
-It probably do, but it is not expected to with with the version of PSScriptAnalyzer
+It probably will, but it is not expected to work with the version of PSScriptAnalyzer
 that is shipped with the Visual Studio Code PowerShell extension.
 
 ## Settings
@@ -52,10 +52,10 @@ the project.
 This file should be located in `.vscode/analyzersettings.psd1` relative to the
 root of the project.
 
-If the project need to use several modules with custom rules, see [Custom rules](https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules#custom-rules).
+If the project needs to use several modules with custom rules, see [Custom rules](https://learn.microsoft.com/en-us/powershell/utility-modules/psscriptanalyzer/using-scriptanalyzer?view=ps-modules#custom-rules).
 
 The important part here is `CustomRulePath` which should point to the relative or
-absolute path to where this module is installed. Below setting assume the project
+absolute path to where this module is installed. The below settings assume the project
 is using [Sampler](https://github.com/gaelcolas/Sampler) build and deploy pipeline
 automation, but that is not a requirement.
 
