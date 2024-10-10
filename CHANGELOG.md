@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable generated docs with `DscResource.DocGenerator`
 - Add HQRM checks
 - Add wiki documentation for usage
+  - Rename file so dashes are replaced by spaces in Wiki.
 
 ### Fixed
 
@@ -45,6 +46,7 @@ and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
 - `Get-TokensFromDefinition.ps1`
   - Remove unused variable.
 - Renamed 'source' folder to all lower-case characters.
+- Update module manifest to use required module PSScriptAnalyzer v1.23
 
 ### Changed
 
