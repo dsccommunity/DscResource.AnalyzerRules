@@ -4,7 +4,7 @@
         cloned. It is automatically clone as soon as any unit or
         integration tests are run.
     #>
-    CustomRulePath      = '.\output\DscResource.AnalyzerRules'
+    CustomRulePath      = '.\output\builtModule\DscResource.AnalyzerRules'
 
     IncludeRules        = @(
         # DSC Resource Kit style guideline rules.

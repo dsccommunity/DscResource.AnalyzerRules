@@ -38,9 +38,9 @@ function Measure-Keyword
         $keywordFlag = [System.Management.Automation.Language.TokenFlags]::Keyword
         $keywords = $Token.Where{ $_.TokenFlags.HasFlag($keywordFlag) -and
             $_.Kind -ne 'DynamicKeyword' -and
-            $keywordsToIgnore -notContains $_.Text
+            $keywordsToIgnore -notcontains $_.Text
         }
-        $upperCaseTokens = $keywords.Where{ $_.Text -cMatch '[A-Z]+' }
+        $upperCaseTokens = $keywords.Where{ $_.Text -cmatch '[A-Z]+' }
 
         $tokenWithNoSpace = $keywords.Where{ $_.Extent.StartScriptPosition.Line -match "\b$($_.Extent.Text)\(.*" }
 
@@ -48,13 +48,13 @@ function Measure-Keyword
         {
             $script:diagnosticRecord['Extent'] = $item.Extent
             $script:diagnosticRecord['Message'] = $script:localizedData.StatementsContainsUpperCaseLetter -f $item.Text
-            $suggestedCorrections = New-Object -TypeName Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]
+            $suggestedCorrections = [System.Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]]::new()
             $splat = @{
                 Extent      = $item.Extent
                 NewString   = $item.Text.ToLower()
                 Description = ('Replace {0} with {1}' -f ($item.Extent.Text, $item.Extent.Text.ToLower()))
             }
-            $suggestedCorrections.Add((New-SuggestedCorrection @splat)) | Out-Null
+            $null = $suggestedCorrections.Add((New-SuggestedCorrection @splat))
 
             $script:diagnosticRecord['suggestedCorrections'] = $suggestedCorrections
             $script:diagnosticRecord -as $diagnosticRecordType
@@ -64,13 +64,13 @@ function Measure-Keyword
         {
             $script:diagnosticRecord['Extent'] = $item.Extent
             $script:diagnosticRecord['Message'] = $script:localizedData.OneSpaceBetweenKeywordAndParenthesis
-            $suggestedCorrections = New-Object -TypeName Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]
+            $suggestedCorrections = [System.Collections.Generic.List[Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.CorrectionExtent]]::new()
             $splat = @{
                 Extent      = $item.Extent
                 NewString   = "$($item.Text) "
                 Description = ('Replace {0} with {1}' -f ("$($item.Extent.Text)(", "$($item.Text) ("))
             }
-            $suggestedCorrections.Add((New-SuggestedCorrection @splat)) | Out-Null
+            $null = $suggestedCorrections.Add((New-SuggestedCorrection @splat))
 
             $script:diagnosticRecord['suggestedCorrections'] = $suggestedCorrections
             $script:diagnosticRecord -as $diagnosticRecordType

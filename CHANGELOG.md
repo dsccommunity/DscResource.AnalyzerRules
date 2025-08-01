@@ -52,6 +52,10 @@ and [#9](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/9).
 
 - Renamed default branch to `main`. Fixes [#12](https://github.com/dsccommunity/DscResource.AnalyzerRules/issues/22).
 - Migrate to Pester 5
+- `Measure-Hashtable`
+  - Comment spelling.
+- `Measure-Keyword`
+  - Replaced `Out-Null` and `New-Object`.
 
 ## [0.2.0] - 2019-11-21
 

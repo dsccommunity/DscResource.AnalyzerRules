@@ -53,7 +53,7 @@ function Measure-Hashtable
             }
             else
             {
-                # We alredy checked that the first line is correctly formatted. Getting the starting indentation here
+                # We already checked that the first line is correctly formatted. Getting the starting indentation here
                 $initialIndent = ([regex]::Match($hashtable.Extent.StartScriptPosition.Line, '(\s*)')).Length
                 $expectedLineIndent = $initialIndent + 5
 

@@ -71,6 +71,7 @@ BuildWorkflow:
     - Create_changelog_release_output
 
   docs:
+    - Check_PSScriptAnalyzer_Availability
     - Generate_Wiki_Content
     - Generate_Conceptual_Help
     - Generate_Markdown_For_Public_Commands
@@ -99,6 +100,20 @@ BuildWorkflow:
     - Publish_Release_To_GitHub
     - Publish_Module_To_gallery
     - Publish_GitHub_Wiki_Content
+
+  Check_PSScriptAnalyzer_Availability: |
+    {
+        Import-Module -Name PSScriptAnalyzer -ErrorAction 'SilentlyContinue'
+
+        try
+        {
+            $null = [Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic.DiagnosticRecord] -as [Type]
+        }
+        catch
+        {
+            Write-Error -Message "The PSScriptAnalyzer namespace Microsoft.Windows.PowerShell.ScriptAnalyzer.Generic is not available. Please install the PSScriptAnalyzer module."
+        }
+    }
 
 ####################################################
 #          Pester Configuration (Sampler)          #
@@ -162,7 +177,7 @@ DscResource.DocGenerator:
       - '\*(.+?)\*' # Match Italic (asterisk)
   Publish_GitHub_Wiki_Content:
     Debug: true
-  Generate_Wiki_Content:
+  Generate_Markdown_For_DSC_Resources:
     MofResourceMetadata:
       Type: MofResource
       Category: Resources
